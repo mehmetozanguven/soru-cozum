@@ -1,0 +1,28 @@
+package com.myProjects.soru_cozum.service;
+
+import java.util.List;
+
+import com.myProjects.soru_cozum.model.Publisher;
+import com.myProjects.soru_cozum.model.Question;
+import com.myProjects.soru_cozum.model.Student;
+import com.myProjects.soru_cozum.request.NewRegisterRequest;
+
+public interface StudentService {
+	
+	Student findById(Long studentId);
+	
+	Student addQuestionToStudent(Student student, Question question);
+	
+	void updateStudent(Student student);
+	
+	Long registerNewStudent(Student student);
+	
+	Student createStudentFromRequest(NewRegisterRequest newRegisterRequest);
+	
+	Question isStudentAskedThatQuestionBefore(Student student, Publisher publisher, int pageNumber,
+			int questionNumber);
+	
+	List<Question> getQuestionList(Student student);
+	
+	List<Question> getAnswerList(Student student);
+}
