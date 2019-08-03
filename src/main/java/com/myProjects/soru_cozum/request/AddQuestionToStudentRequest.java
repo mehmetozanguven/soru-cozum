@@ -4,6 +4,7 @@ package com.myProjects.soru_cozum.request;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.myProjects.soru_cozum.enums.QuestionCategory;
 import com.myProjects.soru_cozum.model.Publisher;
 
 public class AddQuestionToStudentRequest {
@@ -26,7 +27,13 @@ public class AddQuestionToStudentRequest {
 	// temporal, delete when unnecessary
 	@JsonAlias("ImageByte")
 	private String filePath;
-
+	
+	@JsonAlias("QuestionCategory")
+	private QuestionCategory questionCategory;
+	
+	// change the enum value after
+	@JsonAlias("QuestionSubCategory")
+	private String questionSubCategory;
 	
 	public String getFilePath() {
 		return filePath;
@@ -79,6 +86,23 @@ public class AddQuestionToStudentRequest {
 	public void setQuestionNumber(int questionNumber) {
 		this.questionNumber = questionNumber;
 	}
+
+	public QuestionCategory getQuestionCategory() {
+		return questionCategory;
+	}
+
+	public void setQuestionCategory(QuestionCategory questionCategory) {
+		this.questionCategory = questionCategory;
+	}
+
+	public String getQuestionSubCategory() {
+		return questionSubCategory;
+	}
+
+	public void setQuestionSubCategory(String questionSubCategory) {
+		this.questionSubCategory = questionSubCategory;
+	}
+	
 	
 	
 	

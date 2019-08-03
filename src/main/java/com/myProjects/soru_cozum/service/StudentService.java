@@ -6,6 +6,7 @@ import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.Student;
 import com.myProjects.soru_cozum.request.NewRegisterRequest;
+import com.myProjects.soru_cozum.response.StudentQuestionAnswerResponse;
 
 public interface StudentService {
 	
@@ -22,7 +23,9 @@ public interface StudentService {
 	Question isStudentAskedThatQuestionBefore(Student student, Publisher publisher, int pageNumber,
 			int questionNumber);
 	
-	List<Question> getQuestionList(Student student);
+	List<StudentQuestionAnswerResponse> getQuestionList(Student student);
 	
-	List<Question> getAnswerList(Student student);
+	List<StudentQuestionAnswerResponse> getAnswerList(Student student);
+
+	boolean checkStudentExistsWithUsernameAndPassword(String studentName, String studentPassword);
 }

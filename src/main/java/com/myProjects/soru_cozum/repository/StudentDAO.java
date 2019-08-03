@@ -13,6 +13,8 @@ public interface StudentDAO {
 	void updateStudent(Student student);
 
 	Long registerNewStudent(Student student);
+
+	boolean checkStudentExistsWithUsernameAndPassword(String studentName, String studentPassword);
 	
 	
 }

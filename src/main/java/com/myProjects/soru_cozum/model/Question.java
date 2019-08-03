@@ -20,6 +20,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.myProjects.soru_cozum.enums.QuestionCategory;
 
 
 @Entity
@@ -41,6 +42,12 @@ public class Question {
 	@Column(name = "QUESTION_NUMBER")
 	private int questionNumber;
 
+	@Column(name = "QUESTION_CATEGORY", nullable = false)
+	private String questionCategory;
+	
+	@Column(name = "QUESTION_SUB_CATEGORY", nullable = true)
+	private String questionSubCategory;
+	
 	@JsonIgnore
 	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST,
 			CascadeType.REFRESH })
@@ -75,6 +82,8 @@ public class Question {
 	@JoinColumn(name = "PUBLISH_ID")
 	private Publisher publisher;
 	
+
+	
 	public Question() {
 		
 	}
@@ -82,7 +91,7 @@ public class Question {
 	public Question(long id) {
 		this.id = id;
 	}
-	
+
 	public void addTeacherToQuestion(Teacher teacher) {
 		if (teacherList == null)
 			teacherList = new ArrayList<>();
@@ -153,6 +162,27 @@ public class Question {
 	public Publisher getPublisher() {
 		return publisher;
 	}
+
+	public String getQuestionCategory() {
+		return questionCategory;
+	}
+
+	public void setQuestionCategory(QuestionCategory questionCategory) {
+		this.questionCategory = questionCategory.getValue();
+	}
+
+	public String getQuestionSubCategory() {
+		return questionSubCategory;
+	}
+
+	public void setQuestionSubCategory(String questionSubCategory) {
+		this.questionSubCategory = questionSubCategory;
+	}
+
+	public void setPublisher(Publisher publisher) {
+		this.publisher = publisher;
+	}
+
 
 	@Override
 	public String toString() {

@@ -1,5 +1,7 @@
 package com.myProjects.soru_cozum.service;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -7,6 +9,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.myProjects.soru_cozum.enums.QuestionCategory;
 import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.QuestionImage;
@@ -71,7 +74,23 @@ public class QuestionServiceImpl implements QuestionService{
 		return question;
 	}
 	
+	@Override
+	public Question addQuestionCategory(Question question, QuestionCategory questionCategory) {
+		question.setQuestionCategory(questionCategory);
+		return question;
+	}
 	
+	@Override
+	public Question addQuestionSubCategory(Question question, String questionSubCategory) {
+		question.setQuestionSubCategory(questionSubCategory);
+		return question;
+	}
 	
-	
+	@Override
+	public List<Question> getAllQuestionsBySpecificType(QuestionCategory questionCategory) {
+		List<Question> allSpecificQuestions = questionDAO.getAllQuestionsBySpecificType(questionCategory.getValue());
+		if (allSpecificQuestions == null)
+			return Arrays.asList();
+		return allSpecificQuestions;
+	}
 }

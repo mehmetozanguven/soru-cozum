@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -55,5 +56,19 @@ public class QuestionDAOImpl implements QuestionDAO{
 		}
 			
 		return Optional.of(question);
+	}
+	
+	
+	@Override
+	public List<Question> getAllQuestionsBySpecificType(String questionType) {
+		Session currentSess = entityManager.unwrap(Session.class);
+		
+		String hibernateQuery = 
+				"from Question q where q.questionCategory = :value";
+		TypedQuery<Question> query = currentSess.createQuery(hibernateQuery, Question.class);
+		query.setParameter("value", questionType);
+		List<Question> resultList = query.getResultList();
+		
+		return resultList;
 	}
 }

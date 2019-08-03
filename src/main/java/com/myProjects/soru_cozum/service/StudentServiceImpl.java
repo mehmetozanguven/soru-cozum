@@ -18,6 +18,7 @@ import com.myProjects.soru_cozum.repository.PublisherDAO;
 import com.myProjects.soru_cozum.repository.StudentDAO;
 import com.myProjects.soru_cozum.repository.StudentDAOImpl;
 import com.myProjects.soru_cozum.request.NewRegisterRequest;
+import com.myProjects.soru_cozum.response.StudentQuestionAnswerResponse;
 import com.myProjects.soru_cozum.service.jsonService.StudentJSONService;
 
 @Service
@@ -64,29 +65,30 @@ public class StudentServiceImpl implements StudentService{
 
 	@Override
 	public Question isStudentAskedThatQuestionBefore(Student student, Publisher publisher, int pageNumber,
-			int questionNumber) {
-		
+			int questionNumber) {		
 		for (Question eachStudentQuestion : student.getStudentQuestions()) {
 			if (eachStudentQuestion.getPageNumber() == pageNumber && 
 					eachStudentQuestion.getQuestionNumber() == questionNumber && 
 					eachStudentQuestion.getPublisher().getId() == publisher.getId()) {
 				return eachStudentQuestion;
 			}
-				
 		}
 		return new Question(0);
 	}
 
 	@Override
-	public List<Question> getQuestionList(Student student) {
-		return student.getStudentQuestions();
+	public List<StudentQuestionAnswerResponse> getQuestionList(Student student) {
+		return studentJsonService.getStudentQuestions(student);
 	}
 
 	@Override
-	public List<Question> getAnswerList(Student student) {
-		List<Question> answerList = student.getStudentQuestions().stream()
-			.filter(elem -> elem.isAnswered()).collect(Collectors.toCollection(ArrayList::new));
-		return answerList;
+	public List<StudentQuestionAnswerResponse> getAnswerList(Student student) {
+		return studentJsonService.getStudentAnswerList(student);
+	}
+	
+	@Override
+	public boolean checkStudentExistsWithUsernameAndPassword(String studentName, String studentPassword) {
+		return studentDAO.checkStudentExistsWithUsernameAndPassword(studentName, studentPassword);
 	}
 	
 }

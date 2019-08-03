@@ -1,5 +1,8 @@
 package com.myProjects.soru_cozum.service;
 
+import java.util.List;
+
+import com.myProjects.soru_cozum.enums.QuestionCategory;
 import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.QuestionImage;
@@ -20,4 +23,10 @@ public interface QuestionService {
 	Question addQuestionNumberToQuestion(Question question, int questionNumber);
 	
 	Question addIsAnsweredProperty(Question question, boolean isAnswered);
+
+	Question addQuestionCategory(Question question, QuestionCategory questionCategory);
+
+	Question addQuestionSubCategory(Question question, String questionSubCategory);
+
+	List<Question> getAllQuestionsBySpecificType(QuestionCategory questionCategory);
 }

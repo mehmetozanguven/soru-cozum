@@ -1,5 +1,6 @@
 package com.myProjects.soru_cozum.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.myProjects.soru_cozum.model.Publisher;
@@ -9,5 +10,7 @@ public interface QuestionDAO {
 
 	Optional<Question> findQuestionByPageNumberQuestionNumberPublisher(int pageNumber, int questionNumber,
 			Publisher publisher);
+
+	List<Question> getAllQuestionsBySpecificType(String value);
 
 }

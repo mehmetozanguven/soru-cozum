@@ -27,8 +27,6 @@ public class PublisherService {
 	}
 	
 	
-
-
 	public void createNewPublisher(Publisher publisher, Publisher newPublisher) {
 		publisher.setName(newPublisher.getName());
 		publisher.setPublishYear(newPublisher.getPublishYear());

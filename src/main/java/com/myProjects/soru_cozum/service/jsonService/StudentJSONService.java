@@ -4,10 +4,12 @@ import java.util.List;
 
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.Student;
-import com.myProjects.soru_cozum.response.StudentQuestionResponse;
+import com.myProjects.soru_cozum.response.StudentQuestionAnswerResponse;
 
 public interface StudentJSONService {
 
-	List<StudentQuestionResponse> getStudentQuestions(Student student);
+	List<StudentQuestionAnswerResponse> getStudentQuestions(Student student);
+	
+	List<StudentQuestionAnswerResponse> getStudentAnswerList(Student student);
 
 }

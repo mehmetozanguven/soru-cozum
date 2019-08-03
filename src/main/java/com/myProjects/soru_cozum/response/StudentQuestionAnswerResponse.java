@@ -6,10 +6,10 @@ import com.myProjects.soru_cozum.model.json.PublisherJSON;
 import com.myProjects.soru_cozum.model.json.QuestionJSON;
 
 
-public class StudentQuestionResponse {
+public class StudentQuestionAnswerResponse {
 	private QuestionJSON questionJSON;
 	private PublisherJSON publisherJSON;
-	public StudentQuestionResponse(QuestionJSON questionJSON, PublisherJSON publisherJSON) {
+	public StudentQuestionAnswerResponse(QuestionJSON questionJSON, PublisherJSON publisherJSON) {
 		super();
 		this.questionJSON = questionJSON;
 		this.publisherJSON = publisherJSON;

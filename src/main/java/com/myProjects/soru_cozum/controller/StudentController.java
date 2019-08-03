@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.List;
 
-import javax.websocket.server.PathParam;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,16 +17,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.fasterxml.jackson.core.sym.Name;
 import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.QuestionImage;
 import com.myProjects.soru_cozum.model.Student;
 import com.myProjects.soru_cozum.request.AddQuestionToStudentRequest;
 import com.myProjects.soru_cozum.response.AddQuestionToStudentErrorResponse;
+import com.myProjects.soru_cozum.response.StudentQuestionAnswerResponse;
 import com.myProjects.soru_cozum.service.PublisherService;
 import com.myProjects.soru_cozum.service.QuestionService;
-import com.myProjects.soru_cozum.service.StudentServiceImpl;
+import com.myProjects.soru_cozum.service.StudentService;
 
 
 /**
@@ -36,13 +35,13 @@ import com.myProjects.soru_cozum.service.StudentServiceImpl;
  *
  */
 @RestController
-@RequestMapping("/students")
+@RequestMapping("/student")
 public class StudentController {
 	private static final Logger logger = LoggerFactory.getLogger(StudentController.class);	
 	
 	
 	@Autowired
-	private StudentServiceImpl studentService;
+	private StudentService studentService;
 	
 	@Autowired
 	private PublisherService publisherService;
@@ -117,12 +116,12 @@ public class StudentController {
 		
 		// Check the publisher exists, if not create new one
 		Publisher publisher = publisherService.findById((long) addQuestionToStudentRequest.getPublisher().getId());
-		
+		logger.debug("Publisher from database by id: " + publisher);
 		// If there is no publisher with these properties, then this is the new question
 		if (publisher.getName() == "nonce") {
 			Publisher newPublisher = publisherService.createNewPublisherFromRequest(addQuestionToStudentRequest.getPublisher());
 			
-			Question newQuestion = createNewQuestionWithNewPublisher(addQuestionToStudentRequest, newPublisher);
+			Question newQuestion = createNewQuestion(addQuestionToStudentRequest, true, newPublisher);
 			
 			// Add Question to Student
 			student = studentService.addQuestionToStudent(student, newQuestion);
@@ -136,7 +135,8 @@ public class StudentController {
 
 		Question isStudentAskedThatQuestionBefore = studentService.isStudentAskedThatQuestionBefore(student, publisher,
 				addQuestionToStudentRequest.getPageNumber(), addQuestionToStudentRequest.getQuestionNumber());
-		
+		logger.debug("Did student ask that question before ?:"  + isStudentAskedThatQuestionBefore.getId());
+
 		if (isStudentAskedThatQuestionBefore.getId() != 0) {
 			if (isStudentAskedThatQuestionBefore.isAnswered())
 				return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Success", "You asked that question before and it was answered by a teacher check your answer list"));
@@ -147,7 +147,7 @@ public class StudentController {
 		Question isQuestionAskedBySomeone = questionService.findQuestionByPageNumberQuestionNumberPublisher(
 				addQuestionToStudentRequest.getPageNumber(), addQuestionToStudentRequest.getQuestionNumber(),
 				addQuestionToStudentRequest.getPublisher());
-		System.out.println("LSKDFKLDFJK " + isQuestionAskedBySomeone);
+		logger.debug("Did anyone ask that question before ?:"  + isQuestionAskedBySomeone.getId());
 		// Question exists:
 		if (isQuestionAskedBySomeone.getId() != 0) {
 			student = studentService.addQuestionToStudent(student, isQuestionAskedBySomeone);
@@ -158,23 +158,7 @@ public class StudentController {
 		}
 		
 		// After all, this is new question (absolutely!!!)
-		Question newQuestion = new Question();
-		// Create question image for new question
-		tempConvertStringToImageByte(addQuestionToStudentRequest);
-		QuestionImage questionImage = questionService
-				.createNewQuestionImage(addQuestionToStudentRequest.getImageByte());
-		
-		// add page number
-		newQuestion = questionService.addPageNumberToQuestion(newQuestion, addQuestionToStudentRequest.getPageNumber());
-		// add question number
-		newQuestion = questionService.addQuestionNumberToQuestion(newQuestion, addQuestionToStudentRequest.getQuestionNumber());
-		// add unsolved flag
-		newQuestion = questionService.addIsAnsweredProperty(newQuestion, false);
-		// Add image to question
-		newQuestion = questionService.addQuestionImageToQuestion(newQuestion, questionImage);
-		// Add publisher to Question
-		newQuestion = questionService.addPublisherToQuestion(newQuestion, publisher);
-
+		Question newQuestion = createNewQuestion(addQuestionToStudentRequest, false, publisher);
 		// Add Question to Student
 		student = studentService.addQuestionToStudent(student, newQuestion);
 		studentService.updateStudent(student);
@@ -191,7 +175,7 @@ public class StudentController {
 		if (student.getName() == "nonce")
 			return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Error", "Invalid Student ID"));
 		
-		List<Question> questionList = studentService.getQuestionList(student);
+		List<StudentQuestionAnswerResponse> questionList = studentService.getQuestionList(student);
 		
 		if (questionList == null || questionList.isEmpty())
 			return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Success", "You didn't ask any question"));
@@ -207,35 +191,32 @@ public class StudentController {
 		if (student.getName() == "nonce")
 			return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Error", "Invalid Student ID"));
 		
-		List<Question> answerList = studentService.getAnswerList(student);
+		List<StudentQuestionAnswerResponse> answerList = studentService.getAnswerList(student);
 		
 		if (answerList == null || answerList.isEmpty())
-			return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Success", "No question, then no answer"));
+			return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Success", "No answer yet"));
 		
 		return ResponseEntity.ok().body(answerList);
 	}
 	
-	
-	
-	private Question createNewQuestionWithNewPublisher(AddQuestionToStudentRequest addQuestionToStudentRequest,
-			Publisher newPublisher) {
-		// Create new Question
+	private Question createNewQuestion(AddQuestionToStudentRequest addQuestionToStudentRequest, boolean isNewPublisher,
+				Publisher newPublisher) {
 		Question newQuestion = new Question();
 		newQuestion = questionService.addIsAnsweredProperty(newQuestion,false);
 		newQuestion = questionService.addPageNumberToQuestion(newQuestion, addQuestionToStudentRequest.getPageNumber());
 		newQuestion = questionService.addQuestionNumberToQuestion(newQuestion, addQuestionToStudentRequest.getQuestionNumber());
-		
+		newQuestion = questionService.addQuestionCategory(newQuestion, addQuestionToStudentRequest.getQuestionCategory());
+		newQuestion = questionService.addQuestionSubCategory(newQuestion, addQuestionToStudentRequest.getQuestionSubCategory());
 		tempConvertStringToImageByte(addQuestionToStudentRequest);
 		QuestionImage questionImage = questionService.createNewQuestionImage(addQuestionToStudentRequest.getImageByte());
 		
 		// Add image to question 
 		newQuestion = questionService.addQuestionImageToQuestion(newQuestion, questionImage);
-		// Add publisher to Question
-		newQuestion = questionService.addPublisherToQuestion(newQuestion, newPublisher);
+		if (isNewPublisher)
+			newQuestion = questionService.addPublisherToQuestion(newQuestion, newPublisher);
 		return newQuestion;
+		
 	}
-	
-
 
 	private void tempConvertStringToImageByte(AddQuestionToStudentRequest addQuestionToStudentRequest) {
 		File file = new File(addQuestionToStudentRequest.getFilePath());
