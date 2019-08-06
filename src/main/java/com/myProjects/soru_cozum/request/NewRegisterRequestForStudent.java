@@ -1,6 +1,6 @@
 package com.myProjects.soru_cozum.request;
 
-public class NewRegisterRequest {
+public class NewRegisterRequestForStudent {
 	
 	private String studentName;
 	private String studentPassword;

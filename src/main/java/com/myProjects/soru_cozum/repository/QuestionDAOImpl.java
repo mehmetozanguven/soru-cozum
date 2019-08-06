@@ -1,6 +1,5 @@
 package com.myProjects.soru_cozum.repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,6 +8,8 @@ import javax.persistence.TypedQuery;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
@@ -20,12 +21,33 @@ import com.myProjects.soru_cozum.model.Student;
 
 @Repository
 public class QuestionDAOImpl implements QuestionDAO{
+	private final static Logger logger = LoggerFactory.getLogger(QuestionDAOImpl.class);
 	
 	@Autowired
 	private EntityManager entityManager;
 	
 	@Value("${app.model.question}")
 	private String modelQuestion;
+	
+	@Override
+	public Optional<Question> findQuestionById(long questionId) {
+		Session currentSess = entityManager.unwrap(Session.class);
+		String hibernateQuery = 
+				"from Question q where q.id = :questionId";
+		TypedQuery<Question> query = currentSess.createQuery(hibernateQuery, Question.class);
+		query.setParameter("questionId", questionId);
+		
+		List<Question> resultList = query.getResultList();
+		if (!resultList.isEmpty())
+			return Optional.of(resultList.get(0));
+		return Optional.empty();
+	}
+	
+	@Override
+	public void updateQuestion(Question question) {
+		Session currentSess = entityManager.unwrap(Session.class);
+		currentSess.update(question);
+	}
 	
 	@Override
 	public Optional<Question> findQuestionByPageNumberQuestionNumberPublisher(int pageNumber, int questionNumber,
@@ -60,15 +82,31 @@ public class QuestionDAOImpl implements QuestionDAO{
 	
 	
 	@Override
-	public List<Question> getAllQuestionsBySpecificType(String questionType) {
+	public List<Question> getAllNonAnsweredQuestionsBySpecificType(String questionType) {
 		Session currentSess = entityManager.unwrap(Session.class);
 		
 		String hibernateQuery = 
-				"from Question q where q.questionCategory = :value";
+				"from Question q where q.questionCategory = :value and q.isAnswered = false";
 		TypedQuery<Question> query = currentSess.createQuery(hibernateQuery, Question.class);
 		query.setParameter("value", questionType);
 		List<Question> resultList = query.getResultList();
+		logger.debug("All Specific type questions: " + resultList);
 		
 		return resultList;
+	}
+	
+	@Override
+	public QuestionImage getQuestionImageByQuestionId(Long questionId) {
+		Session currentSess = entityManager.unwrap(Session.class);
+		
+		String hibernateQuery = 
+				"select q.questionImage from Question q where q.id = :questionId";
+		
+		TypedQuery<QuestionImage> query = currentSess.createQuery(hibernateQuery, QuestionImage.class);
+		query.setParameter("questionId", questionId);
+		List<QuestionImage> resultList = query.getResultList();
+		if (!resultList.isEmpty())
+			return resultList.get(0);
+		return null;
 	}
 }

@@ -16,6 +16,11 @@ import com.myProjects.soru_cozum.model.QuestionImage;
 import com.myProjects.soru_cozum.repository.QuestionDAO;
 import com.myProjects.soru_cozum.request.AddQuestionToStudentRequest;
 
+/**
+ * 
+ * @author mehmetozanguven
+ *
+ */
 @Service
 @Transactional
 public class QuestionServiceImpl implements QuestionService{
@@ -34,6 +39,16 @@ public class QuestionServiceImpl implements QuestionService{
 		Optional<Question> question = questionDAO.findQuestionByPageNumberQuestionNumberPublisher(pageNumber, questionNumber,
 				publisher);
 		
+		return question.orElse(new Question(0));
+	}
+	
+	/**
+	 * Find the question by Id
+	 * If question doesn't exists, its id will be 0
+	 */
+	@Override
+	public Question findQuestionById(long questionId) {
+		Optional<Question> question = questionDAO.findQuestionById(questionId);
 		return question.orElse(new Question(0));
 	}
 	
@@ -87,10 +102,49 @@ public class QuestionServiceImpl implements QuestionService{
 	}
 	
 	@Override
-	public List<Question> getAllQuestionsBySpecificType(QuestionCategory questionCategory) {
-		List<Question> allSpecificQuestions = questionDAO.getAllQuestionsBySpecificType(questionCategory.getValue());
+	public Question createNewQuestionWithCommonProperties(int pageNumber, int questionNumber,
+			QuestionCategory questionCategory, String questionSubCategory, byte[] questionImageByte) {
+		
+		Question newQuestion = new Question();
+		newQuestion.setPageNumber(pageNumber);
+		newQuestion.setQuestionNumber(questionNumber);
+		newQuestion.setQuestionCategory(questionCategory);
+		newQuestion.setQuestionSubCategory(questionSubCategory);
+		
+		QuestionImage questionImage = new QuestionImage();
+		questionImage.setImage(questionImageByte);
+		
+		newQuestion.setQuestionImage(questionImage);
+		
+		return newQuestion;
+	}
+	
+	@Override
+	public void addPublisherToQuestionn(Question question, Publisher publisher) {
+		question.addPublisherToQuestion(publisher);
+	}
+	
+	
+	@Override
+	public List<Question> getAllNonAnsweredQuestionsBySpecificType(QuestionCategory questionCategory) {
+		List<Question> allSpecificQuestions = questionDAO.getAllNonAnsweredQuestionsBySpecificType(questionCategory.getValue());
 		if (allSpecificQuestions == null)
 			return Arrays.asList();
 		return allSpecificQuestions;
 	}
+	
+	@Override
+	public QuestionImage getQuestionImageByQuestionId(Long questionId) {
+		QuestionImage questionImage = questionDAO.getQuestionImageByQuestionId(questionId);
+		if (questionImage == null)
+			return new QuestionImage((long) 0);
+		return questionImage;
+	}
+	
+	@Override
+	public void updateQuestion(Question question) {
+		questionDAO.updateQuestion(question);
+	}
+	
+	
 }

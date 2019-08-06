@@ -9,9 +9,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.myProjects.soru_cozum.model.Student;
-import com.myProjects.soru_cozum.request.NewRegisterRequest;
+import com.myProjects.soru_cozum.model.Teacher;
+import com.myProjects.soru_cozum.request.NewRegisterRequestForStudent;
+import com.myProjects.soru_cozum.request.NewRegisterRequestForTeacher;
 import com.myProjects.soru_cozum.response.SignupResponse;
 import com.myProjects.soru_cozum.service.StudentService;
+import com.myProjects.soru_cozum.service.TeacherService;
 
 /**
  * Rest controller for sign up requests
@@ -24,6 +27,9 @@ public class SingupController {
 	@Autowired
 	private StudentService studentService;
 	
+	@Autowired
+	private TeacherService teacherService;
+	
 	/**
 	 * Register new student
 	 * Check student exists in the database via name and password
@@ -32,8 +38,8 @@ public class SingupController {
 	 * @param newRegisterRequest is request body
 	 * @return
 	 */
-	@PostMapping
-	public ResponseEntity<?> registerNewStudent(@RequestBody NewRegisterRequest newRegisterRequest){
+	@PostMapping("/student")
+	public ResponseEntity<?> registerNewStudent(@RequestBody NewRegisterRequestForStudent newRegisterRequest){
 		boolean isStudentExists = studentService.checkStudentExistsWithUsernameAndPassword(newRegisterRequest.getStudentName(), newRegisterRequest.getStudentPassword());
 		
 		if (isStudentExists)
@@ -44,6 +50,22 @@ public class SingupController {
 		
 		return ResponseEntity.ok(newStudent);
 	}
+	
+	
+	@PostMapping("/teacher")
+	public ResponseEntity<?> registerNewTeacher(@RequestBody NewRegisterRequestForTeacher newRegisterRequest){
+		boolean isTeacherExists = teacherService.checksTeacherExistsWithUsernameAndPassword(newRegisterRequest.getName(), newRegisterRequest.getPassword());
+		
+		if (isTeacherExists)
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new SignupResponse("Error", "Already have"));
+		
+		Teacher teacher = teacherService.createTeacherFromRequest(newRegisterRequest.getName(), newRegisterRequest.getPassword());
+		teacherService.registerNewTeacher(teacher);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(teacher);
+		
+	}
+	
 	
 	
 	

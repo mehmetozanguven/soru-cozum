@@ -9,7 +9,7 @@ import com.myProjects.soru_cozum.model.Publisher;
 
 public class AddQuestionToStudentRequest {
 	@JsonAlias({"StudentId"})
-	private int studentId;
+	private Long studentId;
 	
 	@JsonAlias("Publisher")
 	private Publisher publisher;
@@ -47,11 +47,11 @@ public class AddQuestionToStudentRequest {
 		this.publisher = publisher;
 	}
 
-	public int getStudentId() {
+	public Long getStudentId() {
 		return studentId;
 	}
 
-	public void setStudentId(int studentId) {
+	public void setStudentId(Long studentId) {
 		this.studentId = studentId;
 	}
 

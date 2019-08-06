@@ -11,11 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.Student;
 
-@Component
+@Repository
 public class StudentDAOImpl implements StudentDAO{
 	private static final Logger logger = LoggerFactory.getLogger(StudentDAOImpl.class);	
 

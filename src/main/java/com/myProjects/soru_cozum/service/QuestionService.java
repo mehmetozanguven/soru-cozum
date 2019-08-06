@@ -9,6 +9,8 @@ import com.myProjects.soru_cozum.model.QuestionImage;
 import com.myProjects.soru_cozum.request.AddQuestionToStudentRequest;
 
 public interface QuestionService {
+	
+	Question findQuestionById(long questionId);
 
 	Question findQuestionByPageNumberQuestionNumberPublisher(int pageNumber, int questionNumber, Publisher publisher);
 
@@ -28,5 +30,14 @@ public interface QuestionService {
 
 	Question addQuestionSubCategory(Question question, String questionSubCategory);
 
-	List<Question> getAllQuestionsBySpecificType(QuestionCategory questionCategory);
+	List<Question> getAllNonAnsweredQuestionsBySpecificType(QuestionCategory questionCategory);
+	
+	QuestionImage getQuestionImageByQuestionId(Long questionId);
+	
+	void updateQuestion(Question question);
+
+	Question createNewQuestionWithCommonProperties(int pageNumber, int questionNumber,
+			QuestionCategory questionCategory, String questionSubCategory, byte[] questionImageByte);
+	
+	void addPublisherToQuestionn(Question question, Publisher publisher);
 }

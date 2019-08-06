@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.myProjects.soru_cozum.enums.QuestionCategory;
 import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.QuestionImage;
@@ -27,6 +29,8 @@ import com.myProjects.soru_cozum.response.StudentQuestionAnswerResponse;
 import com.myProjects.soru_cozum.service.PublisherService;
 import com.myProjects.soru_cozum.service.QuestionService;
 import com.myProjects.soru_cozum.service.StudentService;
+
+import net.bytebuddy.implementation.bytecode.Addition;
 
 
 /**
@@ -120,7 +124,7 @@ public class StudentController {
 		// If there is no publisher with these properties, then this is the new question
 		if (publisher.getName() == "nonce") {
 			Publisher newPublisher = publisherService.createNewPublisherFromRequest(addQuestionToStudentRequest.getPublisher());
-			
+			// true means that, add new publisher to question
 			Question newQuestion = createNewQuestion(addQuestionToStudentRequest, true, newPublisher);
 			
 			// Add Question to Student
@@ -158,7 +162,7 @@ public class StudentController {
 		}
 		
 		// After all, this is new question (absolutely!!!)
-		Question newQuestion = createNewQuestion(addQuestionToStudentRequest, false, publisher);
+		Question newQuestion = createNewQuestion(addQuestionToStudentRequest, true, publisher);
 		// Add Question to Student
 		student = studentService.addQuestionToStudent(student, newQuestion);
 		studentService.updateStudent(student);
@@ -201,8 +205,17 @@ public class StudentController {
 	
 	private Question createNewQuestion(AddQuestionToStudentRequest addQuestionToStudentRequest, boolean isNewPublisher,
 				Publisher newPublisher) {
-		Question newQuestion = new Question();
-		newQuestion = questionService.addIsAnsweredProperty(newQuestion,false);
+		int pageNumber = addQuestionToStudentRequest.getPageNumber();
+		int questionNumber = addQuestionToStudentRequest.getQuestionNumber();
+		QuestionCategory questionCategory = addQuestionToStudentRequest.getQuestionCategory();
+		String questionSubCategory = addQuestionToStudentRequest.getQuestionSubCategory();
+		tempConvertStringToImageByte(addQuestionToStudentRequest);
+		byte[] questionImageByte = addQuestionToStudentRequest.getImageByte();
+		
+		Question newQuestion = questionService.createNewQuestionWithCommonProperties(pageNumber, questionNumber, questionCategory,
+												questionSubCategory, questionImageByte);
+		
+		/*newQuestion = questionService.addIsAnsweredProperty(newQuestion,false);
 		newQuestion = questionService.addPageNumberToQuestion(newQuestion, addQuestionToStudentRequest.getPageNumber());
 		newQuestion = questionService.addQuestionNumberToQuestion(newQuestion, addQuestionToStudentRequest.getQuestionNumber());
 		newQuestion = questionService.addQuestionCategory(newQuestion, addQuestionToStudentRequest.getQuestionCategory());
@@ -211,9 +224,9 @@ public class StudentController {
 		QuestionImage questionImage = questionService.createNewQuestionImage(addQuestionToStudentRequest.getImageByte());
 		
 		// Add image to question 
-		newQuestion = questionService.addQuestionImageToQuestion(newQuestion, questionImage);
+		newQuestion = questionService.addQuestionImageToQuestion(newQuestion, questionImage);*/
 		if (isNewPublisher)
-			newQuestion = questionService.addPublisherToQuestion(newQuestion, newPublisher);
+			questionService.addPublisherToQuestionn(newQuestion, newPublisher);
 		return newQuestion;
 		
 	}

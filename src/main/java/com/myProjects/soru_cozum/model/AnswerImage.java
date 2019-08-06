@@ -21,9 +21,31 @@ public class AnswerImage {
 	private Long id;
 	
 	@Column(name = "IMAGE")
-	private Blob image;
+	private byte[] image;
 	
 	public AnswerImage() {
 		
 	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public byte[] getImage() {
+		return image;
+	}
+
+	public void setImage(byte[] image) {
+		this.image = image;
+	}
+	
+	
+	
+	
+	
+	
 }

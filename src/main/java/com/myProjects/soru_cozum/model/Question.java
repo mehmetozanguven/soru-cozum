@@ -2,6 +2,8 @@ package com.myProjects.soru_cozum.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -73,17 +75,15 @@ public class Question {
 			joinColumns = @JoinColumn(name = "QUESTION_ID"),
 			inverseJoinColumns = @JoinColumn(name = "TEACHER_ID")
 			)
-	private List<Teacher> teacherList;
+	private Set<Teacher> teacherSet;
 		
 	
-	@ManyToOne(fetch = FetchType.LAZY,
+	@ManyToOne(fetch = FetchType.EAGER,
 			cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST,
 					CascadeType.REFRESH })
 	@JoinColumn(name = "PUBLISH_ID")
 	private Publisher publisher;
-	
 
-	
 	public Question() {
 		
 	}
@@ -93,10 +93,10 @@ public class Question {
 	}
 
 	public void addTeacherToQuestion(Teacher teacher) {
-		if (teacherList == null)
-			teacherList = new ArrayList<>();
-		if (!teacherList.contains(teacher))
-			teacherList.add(teacher);
+		if (teacherSet== null)
+			teacherSet = new TreeSet<>();
+		
+		teacherSet.add(teacher);
 	}
 	
 	public void addPublisherToQuestion(Publisher publisher) {
@@ -151,12 +151,16 @@ public class Question {
 		this.questionImage = questionImage;
 	}
 
-	public List<Teacher> getTeacherList() {
-		return teacherList;
+	public Set<Teacher> getTeacherSet() {
+		return teacherSet;
 	}
 
-	public void setTeacherList(List<Teacher> teacherList) {
-		this.teacherList = teacherList;
+	public void setTeacherSet(Set<Teacher> teacherSet) {
+		this.teacherSet = teacherSet;
+	}
+
+	public void setQuestionCategory(String questionCategory) {
+		this.questionCategory = questionCategory;
 	}
 
 	public Publisher getPublisher() {
@@ -188,7 +192,7 @@ public class Question {
 	public String toString() {
 		return "Question [id=" + id + ", isAnswered=" + isAnswered + ", pageNumber=" + pageNumber + ", questionNumber="
 				+ questionNumber + ", studentList=" + studentList + ", questionImage=" + questionImage
-				+ ", teacherList=" + teacherList + ", publisher=" + publisher + "]";
+				+ ", teacherList=" + teacherSet + ", publisher=" + publisher + "]";
 	}
 
 	

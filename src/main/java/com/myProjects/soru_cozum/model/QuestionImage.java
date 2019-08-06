@@ -24,6 +24,10 @@ public class QuestionImage {
 	public QuestionImage() {
 		
 	}
+	
+	public QuestionImage(Long id) {
+		this.id = id;
+	}
 
 	public Long getId() {
 		return id;

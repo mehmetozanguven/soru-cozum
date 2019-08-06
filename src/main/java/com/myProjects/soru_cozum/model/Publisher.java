@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @Table(name = "SS_PUBLISHER")
@@ -29,6 +31,7 @@ public class Publisher {
 	@Column(name = "PUBLISH_YEAR")
 	private int publishYear;
 	
+	@JsonIgnore
 	@OneToMany(cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH },
 			mappedBy = "publisher" )
 	private List<Question> questionList;

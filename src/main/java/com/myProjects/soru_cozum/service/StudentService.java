@@ -5,7 +5,7 @@ import java.util.List;
 import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.Student;
-import com.myProjects.soru_cozum.request.NewRegisterRequest;
+import com.myProjects.soru_cozum.request.NewRegisterRequestForStudent;
 import com.myProjects.soru_cozum.response.StudentQuestionAnswerResponse;
 
 public interface StudentService {
@@ -18,7 +18,7 @@ public interface StudentService {
 	
 	Long registerNewStudent(Student student);
 	
-	Student createStudentFromRequest(NewRegisterRequest newRegisterRequest);
+	Student createStudentFromRequest(NewRegisterRequestForStudent newRegisterRequest);
 	
 	Question isStudentAskedThatQuestionBefore(Student student, Publisher publisher, int pageNumber,
 			int questionNumber);

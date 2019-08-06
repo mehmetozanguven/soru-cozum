@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +19,16 @@ import com.myProjects.soru_cozum.model.Student;
 import com.myProjects.soru_cozum.repository.PublisherDAO;
 import com.myProjects.soru_cozum.repository.StudentDAO;
 import com.myProjects.soru_cozum.repository.StudentDAOImpl;
-import com.myProjects.soru_cozum.request.NewRegisterRequest;
+import com.myProjects.soru_cozum.request.NewRegisterRequestForStudent;
 import com.myProjects.soru_cozum.response.StudentQuestionAnswerResponse;
 import com.myProjects.soru_cozum.service.jsonService.StudentJSONService;
 
 @Service
 @Transactional
 public class StudentServiceImpl implements StudentService{
+	
+	private static final Logger logger = LoggerFactory.getLogger(StudentServiceImpl.class);
+	
 	
 	@Autowired
 	private StudentDAO studentDAO;
@@ -55,7 +60,7 @@ public class StudentServiceImpl implements StudentService{
 	}
 	
 	@Override
-	public Student createStudentFromRequest(NewRegisterRequest newRegisterRequest) {
+	public Student createStudentFromRequest(NewRegisterRequestForStudent newRegisterRequest) {
 		Student newStudent = new Student();
 		newStudent.setName(newRegisterRequest.getStudentName());
 		newStudent.setPassword(newRegisterRequest.getStudentPassword());
@@ -67,6 +72,7 @@ public class StudentServiceImpl implements StudentService{
 	public Question isStudentAskedThatQuestionBefore(Student student, Publisher publisher, int pageNumber,
 			int questionNumber) {		
 		for (Question eachStudentQuestion : student.getStudentQuestions()) {
+			logger.debug("Student question: " + eachStudentQuestion);
 			if (eachStudentQuestion.getPageNumber() == pageNumber && 
 					eachStudentQuestion.getQuestionNumber() == questionNumber && 
 					eachStudentQuestion.getPublisher().getId() == publisher.getId()) {
