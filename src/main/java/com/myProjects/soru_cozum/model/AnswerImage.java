@@ -1,18 +1,17 @@
 package com.myProjects.soru_cozum.model;
 
-import java.sql.Blob;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 
 @Entity
 @Table(name = "SS_ANSWER_IMAGE")
-
 public class AnswerImage {
 	
 	@Id
@@ -22,6 +21,10 @@ public class AnswerImage {
 	
 	@Column(name = "IMAGE")
 	private byte[] image;
+	
+	@ManyToOne
+	@JoinColumn(name = "TEACHER_ID")
+	private Teacher teacher;
 	
 	public AnswerImage() {
 		
@@ -42,10 +45,13 @@ public class AnswerImage {
 	public void setImage(byte[] image) {
 		this.image = image;
 	}
-	
-	
-	
-	
-	
-	
+
+	public Teacher getTeacher() {
+		return teacher;
+	}
+
+	public void setTeacher(Teacher teacher) {
+		this.teacher = teacher;
+	}
+
 }

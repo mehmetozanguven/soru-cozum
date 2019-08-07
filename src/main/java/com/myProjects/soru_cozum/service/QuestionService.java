@@ -15,21 +15,7 @@ public interface QuestionService {
 	Question findQuestionByPageNumberQuestionNumberPublisher(int pageNumber, int questionNumber, Publisher publisher);
 
 	QuestionImage createNewQuestionImage(byte[] imageByte);
-
-	Question addQuestionImageToQuestion(Question question, QuestionImage questionImage);
-
-	Question addPublisherToQuestion(Question question, Publisher publisher);
 	
-	Question addPageNumberToQuestion(Question question, int pageNumber);
-	
-	Question addQuestionNumberToQuestion(Question question, int questionNumber);
-	
-	Question addIsAnsweredProperty(Question question, boolean isAnswered);
-
-	Question addQuestionCategory(Question question, QuestionCategory questionCategory);
-
-	Question addQuestionSubCategory(Question question, String questionSubCategory);
-
 	List<Question> getAllNonAnsweredQuestionsBySpecificType(QuestionCategory questionCategory);
 	
 	QuestionImage getQuestionImageByQuestionId(Long questionId);

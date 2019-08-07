@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.myProjects.soru_cozum.chainPattern.teacherAnswer.AnswerQuestionHandler;
+import com.myProjects.soru_cozum.chainPattern.teacherAnswer.QuestionExistsHandler;
+import com.myProjects.soru_cozum.chainPattern.teacherAnswer.TeacherAnswerHandler;
+import com.myProjects.soru_cozum.chainPattern.teacherAnswer.TeacherAnswerRequest;
+import com.myProjects.soru_cozum.chainPattern.teacherAnswer.TeacherExistsHandler;
 import com.myProjects.soru_cozum.enums.QuestionCategory;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.QuestionImage;
@@ -75,20 +80,14 @@ public class TeacherController {
 	@PostMapping("/answerQuestion")
 	public ResponseEntity<?> answerQuestion(@RequestBody AnswerQuestionRequest answerQuestionRequest){
 		Teacher teacher = teacherService.getTeacherById(answerQuestionRequest.getTeacherId());
-		
-		if (teacher.getId() == 0)
-			return new ResponseEntity<>(new AnswerQuestionResponse("ERROR", "Invalid teacher id"), HttpStatus.NOT_FOUND);
-		
 		Question question = questionService.findQuestionById(answerQuestionRequest.getQuestionId());
-		if (question.getId() == 0)
-			return new ResponseEntity<>(new AnswerQuestionResponse("ERROR", "Invalid question id"), HttpStatus.NOT_FOUND);
 		
-		
-		teacherService.resolveTeacherAccordingToAnswerQuestion(teacher, question, answerQuestionRequest);
-		question.addTeacherToQuestion(teacher);
-		question.setAnswered(true);
-		questionService.updateQuestion(question);
-		
-		return new ResponseEntity<>(new AnswerQuestionResponse("SUCCESS", "Your answer was sent"), HttpStatus.OK);
+		TeacherAnswerRequest request = new TeacherAnswerRequest(questionService, teacherService, teacher, question, answerQuestionRequest);
+		TeacherAnswerHandler teacherExists = new TeacherExistsHandler();
+		TeacherAnswerHandler questionExists = new QuestionExistsHandler();
+		TeacherAnswerHandler answerQuestion = new AnswerQuestionHandler();
+		teacherExists.setNextHandler(questionExists);
+		questionExists.setNextHandler(answerQuestion);
+		return teacherExists.handle(request);
 	}
 }

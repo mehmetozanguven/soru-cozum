@@ -43,9 +43,8 @@ public class StudentServiceImpl implements StudentService{
 	}
 	
 	@Override
-	public Student addQuestionToStudent(Student student, Question question) {
+	public void addQuestionToStudent(Student student, Question question) {
 		student.addQuestionToStudent(question);
-		return student;
 	}
 	
 	@Override

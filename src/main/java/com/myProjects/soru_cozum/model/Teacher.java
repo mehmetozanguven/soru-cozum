@@ -45,15 +45,15 @@ public class Teacher {
 	private Set<Question> questionSet;
 	
 	@OneToMany(fetch = FetchType.LAZY,
-			cascade = CascadeType.ALL
+			cascade = CascadeType.ALL,
+			mappedBy = "teacher"
 			)
-	@JoinColumn(name = "ANSWER_IMAGE_ID")
 	private Set<AnswerImage> answerImageSet;
 	
 	@OneToMany(fetch = FetchType.LAZY,
-			cascade = CascadeType.ALL
+			cascade = CascadeType.ALL,
+			mappedBy = "teacher"
 			)
-	@JoinColumn(name = "ANSWER_VIDEO_ID")
 	private Set<AnswerAudio> answerAudioSet;
 	
 	public Teacher() {

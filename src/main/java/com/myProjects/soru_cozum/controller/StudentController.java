@@ -2,8 +2,6 @@ package com.myProjects.soru_cozum.controller;
 
 
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.List;
 
 
@@ -18,10 +16,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.myProjects.soru_cozum.enums.QuestionCategory;
+import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.StudentAskQuestionHandler;
+import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.NewQuestionHandler;
+import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.PublisherExistsHandler;
+import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.StudentAskQuestionRequestHandler;
+import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.SomeoneAskThatQuestionHandler;
+import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.StudentAskThatQuestionHandler;
+import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.StudentExistsHandler;
 import com.myProjects.soru_cozum.model.Publisher;
-import com.myProjects.soru_cozum.model.Question;
-import com.myProjects.soru_cozum.model.QuestionImage;
 import com.myProjects.soru_cozum.model.Student;
 import com.myProjects.soru_cozum.request.AddQuestionToStudentRequest;
 import com.myProjects.soru_cozum.response.AddQuestionToStudentErrorResponse;
@@ -30,7 +32,6 @@ import com.myProjects.soru_cozum.service.PublisherService;
 import com.myProjects.soru_cozum.service.QuestionService;
 import com.myProjects.soru_cozum.service.StudentService;
 
-import net.bytebuddy.implementation.bytecode.Addition;
 
 
 /**
@@ -112,62 +113,25 @@ public class StudentController {
 	 */
 	@PostMapping("/addQuestionToStudent")
 	public ResponseEntity<?> addQuestionToStudent(@RequestBody AddQuestionToStudentRequest addQuestionToStudentRequest){
-		// Check the student exists
 		Student student = studentService.findById((long)addQuestionToStudentRequest.getStudentId());
-		
-		if (student.getName() == "nonce") 
-			return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Error", "Invalid Student ID"));
-		
-		// Check the publisher exists, if not create new one
 		Publisher publisher = publisherService.findById((long) addQuestionToStudentRequest.getPublisher().getId());
-		logger.debug("Publisher from database by id: " + publisher);
-		// If there is no publisher with these properties, then this is the new question
-		if (publisher.getName() == "nonce") {
-			Publisher newPublisher = publisherService.createNewPublisherFromRequest(addQuestionToStudentRequest.getPublisher());
-			// true means that, add new publisher to question
-			Question newQuestion = createNewQuestion(addQuestionToStudentRequest, true, newPublisher);
-			
-			// Add Question to Student
-			student = studentService.addQuestionToStudent(student, newQuestion);
-			studentService.updateStudent(student);
-
-			return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Success", "Your question was sent to our teacher"));
-			
-		}
+		StudentAskQuestionRequestHandler request = new StudentAskQuestionRequestHandler(studentService, questionService, publisherService);
+		request.setStudent(student);
+		request.setPublisher(publisher);
+		request.setAddQuestionToStudentRequest(addQuestionToStudentRequest);
 		
-		// Check the question asked before that student
-
-		Question isStudentAskedThatQuestionBefore = studentService.isStudentAskedThatQuestionBefore(student, publisher,
-				addQuestionToStudentRequest.getPageNumber(), addQuestionToStudentRequest.getQuestionNumber());
-		logger.debug("Did student ask that question before ?:"  + isStudentAskedThatQuestionBefore.getId());
-
-		if (isStudentAskedThatQuestionBefore.getId() != 0) {
-			if (isStudentAskedThatQuestionBefore.isAnswered())
-				return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Success", "You asked that question before and it was answered by a teacher check your answer list"));
-			else
-				return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Success", "You asked that question before, answer waiting"));
-		}
+		StudentAskQuestionHandler studentCheck = new StudentExistsHandler();
+		StudentAskQuestionHandler publisherCheck = new PublisherExistsHandler();
+		StudentAskQuestionHandler studentAskQuestion = new StudentAskThatQuestionHandler();
+		StudentAskQuestionHandler someoneAskQuestion = new SomeoneAskThatQuestionHandler();
+		StudentAskQuestionHandler newQuestion = new NewQuestionHandler();
 		
-		Question isQuestionAskedBySomeone = questionService.findQuestionByPageNumberQuestionNumberPublisher(
-				addQuestionToStudentRequest.getPageNumber(), addQuestionToStudentRequest.getQuestionNumber(),
-				addQuestionToStudentRequest.getPublisher());
-		logger.debug("Did anyone ask that question before ?:"  + isQuestionAskedBySomeone.getId());
-		// Question exists:
-		if (isQuestionAskedBySomeone.getId() != 0) {
-			student = studentService.addQuestionToStudent(student, isQuestionAskedBySomeone);
-			studentService.updateStudent(student);
-			return ResponseEntity.ok()
-					.body(new AddQuestionToStudentErrorResponse("Success", "Question already have been asked by someone, we added to your list"));
-
-		}
+		studentCheck.setNextHandler(publisherCheck);
+		publisherCheck.setNextHandler(studentAskQuestion);
+		studentAskQuestion.setNextHandler(someoneAskQuestion);
+		someoneAskQuestion.setNextHandler(newQuestion);
 		
-		// After all, this is new question (absolutely!!!)
-		Question newQuestion = createNewQuestion(addQuestionToStudentRequest, true, publisher);
-		// Add Question to Student
-		student = studentService.addQuestionToStudent(student, newQuestion);
-		studentService.updateStudent(student);
-
-		return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Success", "QuestionAdded"));
+		return studentCheck.handle(request);	
 	}
 
 	
@@ -203,48 +167,4 @@ public class StudentController {
 		return ResponseEntity.ok().body(answerList);
 	}
 	
-	private Question createNewQuestion(AddQuestionToStudentRequest addQuestionToStudentRequest, boolean isNewPublisher,
-				Publisher newPublisher) {
-		int pageNumber = addQuestionToStudentRequest.getPageNumber();
-		int questionNumber = addQuestionToStudentRequest.getQuestionNumber();
-		QuestionCategory questionCategory = addQuestionToStudentRequest.getQuestionCategory();
-		String questionSubCategory = addQuestionToStudentRequest.getQuestionSubCategory();
-		tempConvertStringToImageByte(addQuestionToStudentRequest);
-		byte[] questionImageByte = addQuestionToStudentRequest.getImageByte();
-		
-		Question newQuestion = questionService.createNewQuestionWithCommonProperties(pageNumber, questionNumber, questionCategory,
-												questionSubCategory, questionImageByte);
-		
-		/*newQuestion = questionService.addIsAnsweredProperty(newQuestion,false);
-		newQuestion = questionService.addPageNumberToQuestion(newQuestion, addQuestionToStudentRequest.getPageNumber());
-		newQuestion = questionService.addQuestionNumberToQuestion(newQuestion, addQuestionToStudentRequest.getQuestionNumber());
-		newQuestion = questionService.addQuestionCategory(newQuestion, addQuestionToStudentRequest.getQuestionCategory());
-		newQuestion = questionService.addQuestionSubCategory(newQuestion, addQuestionToStudentRequest.getQuestionSubCategory());
-		tempConvertStringToImageByte(addQuestionToStudentRequest);
-		QuestionImage questionImage = questionService.createNewQuestionImage(addQuestionToStudentRequest.getImageByte());
-		
-		// Add image to question 
-		newQuestion = questionService.addQuestionImageToQuestion(newQuestion, questionImage);*/
-		if (isNewPublisher)
-			questionService.addPublisherToQuestionn(newQuestion, newPublisher);
-		return newQuestion;
-		
-	}
-
-	private void tempConvertStringToImageByte(AddQuestionToStudentRequest addQuestionToStudentRequest) {
-		File file = new File(addQuestionToStudentRequest.getFilePath());
-        byte[] bFile = new byte[(int) file.length()];
-        
-        try {
-	     FileInputStream fileInputStream = new FileInputStream(file);
-	     //convert file into array of bytes
-	     fileInputStream.read(bFile);
-	     fileInputStream.close();
-        } catch (Exception e) {
-	     e.printStackTrace();
-        }
-        
-        addQuestionToStudentRequest.setImageByte(bFile);
-		
-	}
 }

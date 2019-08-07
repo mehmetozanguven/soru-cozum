@@ -12,7 +12,7 @@ public interface StudentService {
 	
 	Student findById(Long studentId);
 	
-	Student addQuestionToStudent(Student student, Question question);
+	void addQuestionToStudent(Student student, Question question);
 	
 	void updateStudent(Student student);
 	

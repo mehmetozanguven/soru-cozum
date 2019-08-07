@@ -60,48 +60,6 @@ public class QuestionServiceImpl implements QuestionService{
 	}
 	
 	@Override
-	public Question addQuestionImageToQuestion(Question question, QuestionImage questionImage) {
-		question.setQuestionImage(questionImage);
-		return question;
-	}
-	
-	@Override
-	public Question addPublisherToQuestion(Question question, Publisher publisher) {
-		question.addPublisherToQuestion(publisher);
-		return question;
-	}
-
-	@Override
-	public Question addPageNumberToQuestion(Question question, int pageNumber) {
-		question.setPageNumber(pageNumber);
-		return question;
-	}
-
-	@Override
-	public Question addQuestionNumberToQuestion(Question question, int questionNumber) {
-		question.setQuestionNumber(questionNumber);
-		return question;
-	}
-
-	@Override
-	public Question addIsAnsweredProperty(Question question, boolean isAnswered) {
-		question.setAnswered(isAnswered);
-		return question;
-	}
-	
-	@Override
-	public Question addQuestionCategory(Question question, QuestionCategory questionCategory) {
-		question.setQuestionCategory(questionCategory);
-		return question;
-	}
-	
-	@Override
-	public Question addQuestionSubCategory(Question question, String questionSubCategory) {
-		question.setQuestionSubCategory(questionSubCategory);
-		return question;
-	}
-	
-	@Override
 	public Question createNewQuestionWithCommonProperties(int pageNumber, int questionNumber,
 			QuestionCategory questionCategory, String questionSubCategory, byte[] questionImageByte) {
 		
