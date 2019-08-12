@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.response.AddQuestionToStudentErrorResponse;
 
-public class StudentAskThatQuestionHandler extends StudentAskQuestionHandler{
+public class StudentAskThatQuestionHandler extends StudentAskQuestionAbstractHandler{
 
 	
 	@Override

@@ -13,6 +13,7 @@ import com.myProjects.soru_cozum.enums.QuestionCategory;
 import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.QuestionImage;
+import com.myProjects.soru_cozum.model.Teacher;
 import com.myProjects.soru_cozum.repository.QuestionDAO;
 import com.myProjects.soru_cozum.request.AddQuestionToStudentRequest;
 
@@ -102,6 +103,12 @@ public class QuestionServiceImpl implements QuestionService{
 	@Override
 	public void updateQuestion(Question question) {
 		questionDAO.updateQuestion(question);
+	}
+	
+	@Override
+	public Teacher findTeacherFromQuestion(Long questionId, Long teacherId) {
+		Optional<Teacher> teacher = questionDAO.findTeacherFromQuestionId(questionId, teacherId);
+		return teacher.orElse(new Teacher((long) 0));
 	}
 	
 	

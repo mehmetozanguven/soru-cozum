@@ -3,6 +3,7 @@ package com.myProjects.soru_cozum.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.myProjects.soru_cozum.model.AnswerImage;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.Teacher;
 import com.myProjects.soru_cozum.model.json.AnsweredQuestionJSON;
@@ -23,4 +24,10 @@ public interface TeacherService {
 	Teacher createTeacherFromRequest(String teacherName, String teacherPassword);
 
 	void registerNewTeacher(Teacher teacher);
+
+	AnswerImage getAnswerImageFromTeacher(Long teacherId, Long questionId);
+
+	void updateTeacher(Teacher teacher);
+
+	void updateTeacherAnswerImage(Teacher teacher, AnswerImage oldAnswerImage, AnswerImage newAnswerImage);
 }

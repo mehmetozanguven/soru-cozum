@@ -17,17 +17,20 @@ import org.springframework.stereotype.Repository;
 import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.QuestionImage;
-import com.myProjects.soru_cozum.model.Student;
+import com.myProjects.soru_cozum.model.Teacher;
 
 @Repository
 public class QuestionDAOImpl implements QuestionDAO{
-	private final static Logger logger = LoggerFactory.getLogger(QuestionDAOImpl.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(QuestionDAOImpl.class);
 	
 	@Autowired
 	private EntityManager entityManager;
 	
 	@Value("${app.model.question}")
 	private String modelQuestion;
+	
+	@Value("${app.model.teacher}")
+	private String modelTeacher;
 	
 	@Override
 	public Optional<Question> findQuestionById(long questionId) {
@@ -90,7 +93,7 @@ public class QuestionDAOImpl implements QuestionDAO{
 		TypedQuery<Question> query = currentSess.createQuery(hibernateQuery, Question.class);
 		query.setParameter("value", questionType);
 		List<Question> resultList = query.getResultList();
-		logger.debug("All Specific type questions: " + resultList);
+		LOGGER.debug("All Specific type questions: " + resultList);
 		
 		return resultList;
 	}
@@ -108,5 +111,29 @@ public class QuestionDAOImpl implements QuestionDAO{
 		if (!resultList.isEmpty())
 			return resultList.get(0);
 		return null;
+	}
+	
+	@Override
+	public Optional<Teacher> findTeacherFromQuestionId(Long questionId, Long teacherId) {
+		Question question = new Question();
+		Session currentSess = entityManager.unwrap(Session.class);
+		
+		String hibernateQuery = 
+			"SELECT q.teacherSet from Question q JOIN q.teacherSet t where q.id = :questionId and t.id = :teacherId";
+		
+		Query<Object[]> query = currentSess.createQuery(hibernateQuery);
+		query.setParameter("questionId", questionId);
+		query.setParameter("teacherId", teacherId);
+		List<Object[]> resultList = query.getResultList();
+		
+		Teacher teacher = null;
+		for (Object each : resultList) {
+			if (each.getClass().getSimpleName().equals(modelTeacher)) {
+				teacher = (Teacher) each;
+			}
+		}
+		LOGGER.debug("result list: " + resultList);
+		
+		return Optional.of(teacher);
 	}
 }

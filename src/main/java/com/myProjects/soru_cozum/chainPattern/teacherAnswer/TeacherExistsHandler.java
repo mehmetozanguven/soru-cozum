@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.myProjects.soru_cozum.response.AnswerQuestionResponse;
 
-public class TeacherExistsHandler extends TeacherAnswerHandler{
+public class TeacherExistsHandler extends TeacherAnswerAbstractHandler{
 
 	@Override
 	public ResponseEntity<?> handle(TeacherAnswerRequest request) {

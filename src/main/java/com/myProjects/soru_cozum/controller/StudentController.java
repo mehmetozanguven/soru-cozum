@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.StudentAskQuestionHandler;
+import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.StudentAskQuestionAbstractHandler;
 import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.NewQuestionHandler;
 import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.PublisherExistsHandler;
 import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.StudentAskQuestionRequestHandler;
@@ -120,11 +120,11 @@ public class StudentController {
 		request.setPublisher(publisher);
 		request.setAddQuestionToStudentRequest(addQuestionToStudentRequest);
 		
-		StudentAskQuestionHandler studentCheck = new StudentExistsHandler();
-		StudentAskQuestionHandler publisherCheck = new PublisherExistsHandler();
-		StudentAskQuestionHandler studentAskQuestion = new StudentAskThatQuestionHandler();
-		StudentAskQuestionHandler someoneAskQuestion = new SomeoneAskThatQuestionHandler();
-		StudentAskQuestionHandler newQuestion = new NewQuestionHandler();
+		StudentAskQuestionAbstractHandler studentCheck = new StudentExistsHandler();
+		StudentAskQuestionAbstractHandler publisherCheck = new PublisherExistsHandler();
+		StudentAskQuestionAbstractHandler studentAskQuestion = new StudentAskThatQuestionHandler();
+		StudentAskQuestionAbstractHandler someoneAskQuestion = new SomeoneAskThatQuestionHandler();
+		StudentAskQuestionAbstractHandler newQuestion = new NewQuestionHandler();
 		
 		studentCheck.setNextHandler(publisherCheck);
 		publisherCheck.setNextHandler(studentAskQuestion);

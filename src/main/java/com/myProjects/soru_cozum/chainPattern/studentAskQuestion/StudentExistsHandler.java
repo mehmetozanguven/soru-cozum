@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.myProjects.soru_cozum.response.AddQuestionToStudentErrorResponse;
 
-public class StudentExistsHandler extends StudentAskQuestionHandler {
+public class StudentExistsHandler extends StudentAskQuestionAbstractHandler {
 
 	
 	@Override

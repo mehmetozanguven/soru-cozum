@@ -2,7 +2,9 @@ package com.myProjects.soru_cozum.request;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AnswerQuestionRequest {
 	
 	@JsonAlias("TeacherId")

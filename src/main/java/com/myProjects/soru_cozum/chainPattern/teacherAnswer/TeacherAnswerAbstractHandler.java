@@ -2,14 +2,14 @@ package com.myProjects.soru_cozum.chainPattern.teacherAnswer;
 
 import org.springframework.http.ResponseEntity;
 
-public abstract class TeacherAnswerHandler {
-	private TeacherAnswerHandler nextHandler;
+public abstract class TeacherAnswerAbstractHandler {
+	private TeacherAnswerAbstractHandler nextHandler;
 	
-	public void setNextHandler(TeacherAnswerHandler nextHandler) {
+	public void setNextHandler(TeacherAnswerAbstractHandler nextHandler) {
 		this.nextHandler = nextHandler;
 	}
 	
-	public TeacherAnswerHandler getNextHandler() {
+	public TeacherAnswerAbstractHandler getNextHandler() {
 		return this.nextHandler;
 	}
 	

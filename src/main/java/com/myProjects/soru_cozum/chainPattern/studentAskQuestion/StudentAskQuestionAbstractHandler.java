@@ -11,17 +11,17 @@ import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.request.AddQuestionToStudentRequest;
 import com.myProjects.soru_cozum.service.QuestionService;
 
-public abstract class StudentAskQuestionHandler {
-	private StudentAskQuestionHandler nextHandler;
+public abstract class StudentAskQuestionAbstractHandler {
+	private StudentAskQuestionAbstractHandler nextHandler;
 	
 	
 	public abstract ResponseEntity<?> handle(StudentAskQuestionRequestHandler request);
 	
-	public void setNextHandler(StudentAskQuestionHandler handler) {
+	public void setNextHandler(StudentAskQuestionAbstractHandler handler) {
 		this.nextHandler = handler;
 	}
 	
-	public StudentAskQuestionHandler getNextHandler() {
+	public StudentAskQuestionAbstractHandler getNextHandler() {
 		return this.nextHandler;
 	}
 	

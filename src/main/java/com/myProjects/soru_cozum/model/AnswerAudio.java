@@ -2,6 +2,7 @@ package com.myProjects.soru_cozum.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -23,10 +24,12 @@ public class AnswerAudio {
 	@Column(name = "IMAGE")
 	private byte[] image;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "TEACHER_ID")
 	private Teacher teacher;
 	
+	@Column(name = "QUESTION_ID")
+	private Long associatedQuestionId;
 	
 	public AnswerAudio() {
 	}
@@ -53,6 +56,14 @@ public class AnswerAudio {
 
 	public void setTeacher(Teacher teacher) {
 		this.teacher = teacher;
+	}
+
+	public Long getAssociatedQuestionId() {
+		return associatedQuestionId;
+	}
+
+	public void setAssociatedQuestionId(Long associatedQuestionId) {
+		this.associatedQuestionId = associatedQuestionId;
 	}
 
 	

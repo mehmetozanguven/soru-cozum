@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,16 +24,20 @@ import com.myProjects.soru_cozum.model.json.AnsweredQuestionJSON;
 import com.myProjects.soru_cozum.model.json.PublisherJSON;
 import com.myProjects.soru_cozum.model.json.QuestionJSON;
 import com.myProjects.soru_cozum.model.json.StudentJSON;
+import com.myProjects.soru_cozum.repository.AnswerDAO;
 import com.myProjects.soru_cozum.repository.TeacherDAO;
-import com.myProjects.soru_cozum.request.AddQuestionToStudentRequest;
 import com.myProjects.soru_cozum.request.AnswerQuestionRequest;
-import com.myProjects.soru_cozum.request.NewRegisterRequestForTeacher;
 
 @Service
 @Transactional
 public class TeacherServiceImpl implements TeacherService{
+	private final static Logger LOGGER = LoggerFactory.getLogger(TeacherServiceImpl.class);
+	
 	@Autowired
 	private TeacherDAO teacherDAO;
+	
+	@Autowired
+	private AnswerDAO answerDAO;
 	
 	@Override
 	public Teacher getTeacherById(long teacherId) {
@@ -47,9 +53,11 @@ public class TeacherServiceImpl implements TeacherService{
 		
 		AnswerImage answerImage = new AnswerImage();
 		answerImage.setImage(answerQuestionRequest.getImageByte());
+		answerImage.setAssociatedQuestionId(answerQuestionRequest.getQuestionId());
 		
 		AnswerAudio answerAudio = new AnswerAudio();
 		answerAudio.setImage(answerQuestionRequest.getAudioByte());
+		answerAudio.setAssociatedQuestionId(answerQuestionRequest.getQuestionId());
 		
 		teacher.addImageToTeacher(answerImage);
 		teacher.addAudioToTeacher(answerAudio);
@@ -61,7 +69,7 @@ public class TeacherServiceImpl implements TeacherService{
 		for (Question eachQuestion : teacher.getQuestionSet()) {
 			Publisher publisher = eachQuestion.getPublisher();
 			PublisherJSON publisherJSON = new PublisherJSON(publisher.getId(), publisher.getName(), publisher.getPublishYear());
-			
+			LOGGER.debug("Answered list: " + teacher.getAnswerImageSet().size());
 			QuestionJSON questionJSON = new QuestionJSON(eachQuestion.getId(), eachQuestion.getQuestionImage().getId(),
 					eachQuestion.isAnswered());
 			
@@ -95,6 +103,24 @@ public class TeacherServiceImpl implements TeacherService{
 	@Override
 	public void registerNewTeacher(Teacher teacher) {
 		teacherDAO.registerNewTeacher(teacher);
+	}
+	
+	@Override
+	public AnswerImage getAnswerImageFromTeacher(Long teacherId, Long questionId) {
+		Optional<AnswerImage> answerImage = teacherDAO.getAnswerImageFromTeacher(teacherId, questionId);
+		return answerImage.orElse(new AnswerImage((long) 0));
+	}
+	
+	@Override
+	public void updateTeacher(Teacher teacher) {
+		teacherDAO.updateTeacher(teacher);	
+	}
+	
+	@Override
+	public void updateTeacherAnswerImage(Teacher teacher, AnswerImage oldAnswerImage, AnswerImage newAnswerImage) {
+		teacher.updateAnswerImage(oldAnswerImage, newAnswerImage);
+		answerDAO.deleteAnswerImage(oldAnswerImage);
+		teacherDAO.updateTeacher(teacher);
 	}
 	
 	

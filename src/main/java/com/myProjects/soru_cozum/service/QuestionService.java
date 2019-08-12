@@ -6,6 +6,7 @@ import com.myProjects.soru_cozum.enums.QuestionCategory;
 import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.QuestionImage;
+import com.myProjects.soru_cozum.model.Teacher;
 import com.myProjects.soru_cozum.request.AddQuestionToStudentRequest;
 
 public interface QuestionService {
@@ -26,4 +27,6 @@ public interface QuestionService {
 			QuestionCategory questionCategory, String questionSubCategory, byte[] questionImageByte);
 	
 	void addPublisherToQuestionn(Question question, Publisher publisher);
+
+	Teacher findTeacherFromQuestion(Long questionId, Long teacherId);
 }

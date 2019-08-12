@@ -6,7 +6,7 @@ import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.response.AddQuestionToStudentErrorResponse;
 
 
-public class SomeoneAskThatQuestionHandler extends StudentAskQuestionHandler{
+public class SomeoneAskThatQuestionHandler extends StudentAskQuestionAbstractHandler{
 	
 	
 	@Override

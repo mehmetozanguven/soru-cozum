@@ -1,7 +1,11 @@
 package com.myProjects.soru_cozum.model;
 
+import java.util.Arrays;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -22,12 +26,20 @@ public class AnswerImage {
 	@Column(name = "IMAGE")
 	private byte[] image;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY,
+			cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinColumn(name = "TEACHER_ID")
 	private Teacher teacher;
 	
+	@Column(name = "QUESTION_ID")
+	private Long associatedQuestionId;
+	
 	public AnswerImage() {
 		
+	}
+	
+	public AnswerImage(Long id) {
+		this.id = id;
 	}
 
 	public Long getId() {
@@ -54,4 +66,20 @@ public class AnswerImage {
 		this.teacher = teacher;
 	}
 
+	public Long getAssociatedQuestionId() {
+		return associatedQuestionId;
+	}
+
+	public void setAssociatedQuestionId(Long associatedQuestionId) {
+		this.associatedQuestionId = associatedQuestionId;
+	}
+
+	@Override
+	public String toString() {
+		return "AnswerImage [id=" + id + " teacher=" + teacher
+				+ ", associatedQuestionId=" + associatedQuestionId + "]";
+	}
+	
+	
+	
 }

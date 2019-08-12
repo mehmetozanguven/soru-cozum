@@ -8,7 +8,7 @@ import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.response.AddQuestionToStudentErrorResponse;
 
 
-public class PublisherExistsHandler extends StudentAskQuestionHandler {
+public class PublisherExistsHandler extends StudentAskQuestionAbstractHandler {
 
 	@Override
 	public ResponseEntity<?> handle(StudentAskQuestionRequestHandler request) {

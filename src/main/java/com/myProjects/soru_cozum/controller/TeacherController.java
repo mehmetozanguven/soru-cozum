@@ -1,7 +1,6 @@
 package com.myProjects.soru_cozum.controller;
 
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,10 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.myProjects.soru_cozum.chainPattern.teacherAnswer.AnswerQuestionHandler;
 import com.myProjects.soru_cozum.chainPattern.teacherAnswer.QuestionExistsHandler;
-import com.myProjects.soru_cozum.chainPattern.teacherAnswer.TeacherAnswerHandler;
+import com.myProjects.soru_cozum.chainPattern.teacherAnswer.TeacherAnswerAbstractHandler;
 import com.myProjects.soru_cozum.chainPattern.teacherAnswer.TeacherAnswerRequest;
 import com.myProjects.soru_cozum.chainPattern.teacherAnswer.TeacherExistsHandler;
 import com.myProjects.soru_cozum.enums.QuestionCategory;
+import com.myProjects.soru_cozum.model.AnswerImage;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.QuestionImage;
 import com.myProjects.soru_cozum.model.Teacher;
@@ -83,11 +83,30 @@ public class TeacherController {
 		Question question = questionService.findQuestionById(answerQuestionRequest.getQuestionId());
 		
 		TeacherAnswerRequest request = new TeacherAnswerRequest(questionService, teacherService, teacher, question, answerQuestionRequest);
-		TeacherAnswerHandler teacherExists = new TeacherExistsHandler();
-		TeacherAnswerHandler questionExists = new QuestionExistsHandler();
-		TeacherAnswerHandler answerQuestion = new AnswerQuestionHandler();
+		
+		TeacherAnswerAbstractHandler teacherExists = new TeacherExistsHandler();
+		TeacherAnswerAbstractHandler questionExists = new QuestionExistsHandler();
+		TeacherAnswerAbstractHandler answerQuestion = new AnswerQuestionHandler();
 		teacherExists.setNextHandler(questionExists);
 		questionExists.setNextHandler(answerQuestion);
 		return teacherExists.handle(request);
 	}
+	
+	@PostMapping("/updateAnswerImage")
+	public ResponseEntity<?> updateAnswerImage(@RequestBody AnswerQuestionRequest answerQuestionRequest){
+		Teacher teacher = teacherService.getTeacherById(answerQuestionRequest.getTeacherId());
+		AnswerImage oldAnswerImage = teacherService.getAnswerImageFromTeacher(answerQuestionRequest.getTeacherId(), answerQuestionRequest.getQuestionId());
+		if (oldAnswerImage.getId() == 0)
+			return new ResponseEntity<>("Error happened", HttpStatus.INTERNAL_SERVER_ERROR);
+		
+		AnswerImage newAnswerImage = new AnswerImage();
+		newAnswerImage.setAssociatedQuestionId(answerQuestionRequest.getQuestionId());
+		newAnswerImage.setImage(answerQuestionRequest.getImageByte());
+		
+		teacherService.updateTeacherAnswerImage(teacher, oldAnswerImage, newAnswerImage);
+		
+		return new ResponseEntity<>("You changed your answer", HttpStatus.OK);
+	}
+	
+	
 }

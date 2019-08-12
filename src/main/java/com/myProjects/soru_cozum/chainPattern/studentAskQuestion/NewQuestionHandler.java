@@ -5,7 +5,7 @@ import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.response.AddQuestionToStudentErrorResponse;
 
 
-public class NewQuestionHandler extends StudentAskQuestionHandler {
+public class NewQuestionHandler extends StudentAskQuestionAbstractHandler {
 
 	@Override
 	public ResponseEntity<?> handle(StudentAskQuestionRequestHandler request) {
