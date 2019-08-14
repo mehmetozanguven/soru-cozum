@@ -41,7 +41,6 @@ public class StudentDAOImpl implements StudentDAO{
 	@Override
 	public void updateStudent(Student student) {
 		Session currentSes = entityManager.unwrap(Session.class);
-		
 		currentSes.update(student);
 	}
 	

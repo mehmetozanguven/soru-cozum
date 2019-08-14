@@ -42,8 +42,7 @@ import com.myProjects.soru_cozum.service.StudentService;
 @RestController
 @RequestMapping("/student")
 public class StudentController {
-	private static final Logger logger = LoggerFactory.getLogger(StudentController.class);	
-	
+	private static final Logger LOGGER = LoggerFactory.getLogger(StudentController.class);		
 	
 	@Autowired
 	private StudentService studentService;
@@ -57,7 +56,7 @@ public class StudentController {
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<?> findStudentById(@PathVariable(value="id") Long studentId) {
-		logger.debug(String.valueOf(studentId));
+		LOGGER.debug(String.valueOf(studentId));
 		Student student = studentService.findById(studentId);
 		if (student.getName() != "nonce")
 			return ResponseEntity.ok().body(student);
@@ -113,6 +112,7 @@ public class StudentController {
 	 */
 	@PostMapping("/addQuestionToStudent")
 	public ResponseEntity<?> addQuestionToStudent(@RequestBody AddQuestionToStudentRequest addQuestionToStudentRequest){
+		LOGGER.debug("Student will add new Question his list");
 		Student student = studentService.findById((long)addQuestionToStudentRequest.getStudentId());
 		Publisher publisher = publisherService.findById((long) addQuestionToStudentRequest.getPublisher().getId());
 		StudentAskQuestionRequestHandler request = new StudentAskQuestionRequestHandler(studentService, questionService, publisherService);

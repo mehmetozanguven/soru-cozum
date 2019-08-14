@@ -16,6 +16,8 @@ public interface StudentService {
 	
 	void updateStudent(Student student);
 	
+	void addQuestionToStudentWithoutCreatingNewQuestion(Question question, Student student);
+	
 	Long registerNewStudent(Student student);
 	
 	Student createStudentFromRequest(NewRegisterRequestForStudent newRegisterRequest);

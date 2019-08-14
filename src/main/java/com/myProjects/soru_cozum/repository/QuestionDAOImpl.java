@@ -55,32 +55,26 @@ public class QuestionDAOImpl implements QuestionDAO{
 	@Override
 	public Optional<Question> findQuestionByPageNumberQuestionNumberPublisher(int pageNumber, int questionNumber,
 			Publisher publisher) {
-		Question question = new Question();
+		Question question = null;
+		Long publisherId = publisher.getId();
 		Session currentSess = entityManager.unwrap(Session.class);
 		
 		String hibernateQuery = 
-			"from Question q LEFT OUTER JOIN q.publisher pub where q.pageNumber = :pageNumber and "
-				+ "q.questionNumber = :questionNumber";
+			"SELECT q from Question q where q.publisher.id = :publisherId and q.pageNumber = :pageNumber and q.questionNumber = :questionNumber";
 		
-		Query<Object[]> query = currentSess.createQuery(hibernateQuery);
+		Query<Question> query = currentSess.createQuery(hibernateQuery);
 		query.setParameter("pageNumber", pageNumber);
 		query.setParameter("questionNumber", questionNumber);
-		List<Object[]> queryResult = query.getResultList();
-		
-		for (Object[] eachObject : queryResult) {
-			for (int i = 0; i < eachObject.length; i++) {
-				if (eachObject[i] != null && eachObject[i].getClass().getSimpleName().equals(modelQuestion))
-					question = (Question) eachObject[i];
-			}
-			
+		query.setParameter("publisherId", publisherId);
+		List<Question> queryResult = query.getResultList();
+		LOGGER.debug("findQuestionByPageNumberQuestionNumberPublisher result: " + queryResult);
+		for (Question eachObject : queryResult) {
+			LOGGER.debug("each object: " + eachObject);
+			question = eachObject;
 		}
+		LOGGER.debug("Question: " + question);
 		
-		if (question.getId() == null) {
-			question.setId((long)0);
-			return Optional.of(question);
-		}
-			
-		return Optional.of(question);
+		return Optional.ofNullable(question);
 	}
 	
 	

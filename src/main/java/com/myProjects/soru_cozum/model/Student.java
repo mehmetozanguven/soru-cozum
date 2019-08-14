@@ -2,6 +2,8 @@ package com.myProjects.soru_cozum.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -16,9 +18,13 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Entity
 @Table(name = "SS_STUDENTS")
 public class Student {
+	private static final Logger LOGGER = LoggerFactory.getLogger(Student.class);
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,23 +50,22 @@ public class Student {
 	
 	@ManyToMany(
 		fetch = FetchType.LAZY,
-		cascade = {CascadeType.DETACH, CascadeType.MERGE,
-				CascadeType.PERSIST, CascadeType.REFRESH}
+		cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST,
+				CascadeType.REFRESH}
 			)
 	@JoinTable(name = "SS_QUESTION_STUDENT",
 		joinColumns = @JoinColumn(name = "STUDENT_ID"),
 		inverseJoinColumns = @JoinColumn(name = "QUESTION_ID")
 			)
-	private List<Question> studentQuestions;
+	private Set<Question> studentQuestions;
 
 		
-	public void addQuestionToStudent(Question question) {
-		
+	public void addQuestionToStudent(Question question) {		
 		if (studentQuestions == null)
-			studentQuestions = new ArrayList<Question>();
-		
-		if (!studentQuestions.contains(question))
-			studentQuestions.add(question);
+			studentQuestions = new TreeSet<Question>();
+		LOGGER.debug("Size of student question list, before adding question to Student:" + studentQuestions.size());
+		studentQuestions.add(question);
+		LOGGER.debug("Size of student question list, after adding question to Student:" + studentQuestions.size());
 	}
 
 	public Long getId() {
@@ -95,11 +100,11 @@ public class Student {
 		this.password = password;
 	}
 
-	public List<Question> getStudentQuestions() {
+	public Set<Question> getStudentQuestions() {
 		return studentQuestions;
 	}
 
-	public void setStudentQuestions(List<Question> studentQuestions) {
+	public void setStudentQuestions(Set<Question> studentQuestions) {
 		this.studentQuestions = studentQuestions;
 	}
 

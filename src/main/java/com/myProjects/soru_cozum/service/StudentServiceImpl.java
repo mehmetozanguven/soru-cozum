@@ -27,7 +27,7 @@ import com.myProjects.soru_cozum.service.jsonService.StudentJSONService;
 @Transactional
 public class StudentServiceImpl implements StudentService{
 	
-	private static final Logger logger = LoggerFactory.getLogger(StudentServiceImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(StudentServiceImpl.class);
 	
 	
 	@Autowired
@@ -51,6 +51,12 @@ public class StudentServiceImpl implements StudentService{
 	public void updateStudent(Student student) {
 		studentDAO.updateStudent(student);
 	}
+	
+	@Override
+	public void addQuestionToStudentWithoutCreatingNewQuestion(Question question, Student student) {
+		student.addQuestionToStudent(question);
+		studentDAO.updateStudent(student);
+	}
 
 	@Override
 	public Long registerNewStudent(Student student) {
@@ -71,7 +77,7 @@ public class StudentServiceImpl implements StudentService{
 	public Question isStudentAskedThatQuestionBefore(Student student, Publisher publisher, int pageNumber,
 			int questionNumber) {		
 		for (Question eachStudentQuestion : student.getStudentQuestions()) {
-			logger.debug("Student question: " + eachStudentQuestion);
+			LOGGER.debug("Student question: " + eachStudentQuestion);
 			if (eachStudentQuestion.getPageNumber() == pageNumber && 
 					eachStudentQuestion.getQuestionNumber() == questionNumber && 
 					eachStudentQuestion.getPublisher().getId() == publisher.getId()) {
