@@ -15,6 +15,10 @@ public interface StudentDAO {
 	Long registerNewStudent(Student student);
 
 	boolean checkStudentExistsWithUsernameAndPassword(String studentName, String studentPassword);
+
+	Optional<Student> findByUsernameAndPassword(String username, String password);
+
+	Optional<Student> findByUsername(String username);
 	
 	
 }

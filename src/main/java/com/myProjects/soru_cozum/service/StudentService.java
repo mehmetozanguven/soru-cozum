@@ -1,6 +1,7 @@
 package com.myProjects.soru_cozum.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Question;
@@ -11,6 +12,10 @@ import com.myProjects.soru_cozum.response.StudentQuestionAnswerResponse;
 public interface StudentService {
 	
 	Student findById(Long studentId);
+	
+	Student findByUsernameAndPassword(String username, String password);
+	
+	Optional<Student> findByUsername(String username);
 	
 	void addQuestionToStudent(Student student, Question question);
 	

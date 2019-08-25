@@ -40,6 +40,9 @@ public class Student {
 	@Column(name = "PASSWORD")
 	private String password;
 	
+	@Column(name = "USERNAME")
+	private String username;
+	
 	public Student() {
 		
 	}
@@ -108,9 +111,13 @@ public class Student {
 		this.studentQuestions = studentQuestions;
 	}
 
-	
-	
-	
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
 	
 	
 }

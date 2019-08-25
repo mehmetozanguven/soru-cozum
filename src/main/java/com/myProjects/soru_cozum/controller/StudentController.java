@@ -40,7 +40,7 @@ import com.myProjects.soru_cozum.service.StudentService;
  *
  */
 @RestController
-@RequestMapping("/student")
+@RequestMapping("/api/student")
 public class StudentController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(StudentController.class);		
 	
@@ -53,6 +53,19 @@ public class StudentController {
 	@Autowired
 	private QuestionService questionService;
 	
+	private StudentAskQuestionAbstractHandler studentCheck;
+	private StudentAskQuestionAbstractHandler publisherCheck;
+	private StudentAskQuestionAbstractHandler studentAskQuestion;
+	private StudentAskQuestionAbstractHandler someoneAskQuestion;
+	private StudentAskQuestionAbstractHandler newQuestion;
+	
+	public StudentController() {
+		studentCheck = new StudentExistsHandler();
+		publisherCheck = new PublisherExistsHandler();
+		studentAskQuestion = new StudentAskThatQuestionHandler();
+		someoneAskQuestion = new SomeoneAskThatQuestionHandler();
+		newQuestion = new NewQuestionHandler();
+	}
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<?> findStudentById(@PathVariable(value="id") Long studentId) {
@@ -112,19 +125,13 @@ public class StudentController {
 	 */
 	@PostMapping("/addQuestionToStudent")
 	public ResponseEntity<?> addQuestionToStudent(@RequestBody AddQuestionToStudentRequest addQuestionToStudentRequest){
-		LOGGER.debug("Student will add new Question his list");
+		LOGGER.debug("Student will add new Question in his list");
 		Student student = studentService.findById((long)addQuestionToStudentRequest.getStudentId());
 		Publisher publisher = publisherService.findById((long) addQuestionToStudentRequest.getPublisher().getId());
 		StudentAskQuestionRequestHandler request = new StudentAskQuestionRequestHandler(studentService, questionService, publisherService);
 		request.setStudent(student);
 		request.setPublisher(publisher);
 		request.setAddQuestionToStudentRequest(addQuestionToStudentRequest);
-		
-		StudentAskQuestionAbstractHandler studentCheck = new StudentExistsHandler();
-		StudentAskQuestionAbstractHandler publisherCheck = new PublisherExistsHandler();
-		StudentAskQuestionAbstractHandler studentAskQuestion = new StudentAskThatQuestionHandler();
-		StudentAskQuestionAbstractHandler someoneAskQuestion = new SomeoneAskThatQuestionHandler();
-		StudentAskQuestionAbstractHandler newQuestion = new NewQuestionHandler();
 		
 		studentCheck.setNextHandler(publisherCheck);
 		publisherCheck.setNextHandler(studentAskQuestion);

@@ -4,8 +4,16 @@ public class NewRegisterRequestForStudent {
 	
 	private String studentName;
 	private String studentPassword;
+	private String username;
 	private String surname;
 
+	
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
 	public String getStudentName() {
 		return studentName;
 	}
@@ -24,8 +32,5 @@ public class NewRegisterRequestForStudent {
 	public void setSurname(String surname) {
 		this.surname = surname;
 	}
-	
-	
-	
 	
 }

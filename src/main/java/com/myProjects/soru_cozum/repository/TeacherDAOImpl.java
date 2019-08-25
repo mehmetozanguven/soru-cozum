@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.TypedQuery;
 
 import org.hibernate.Session;
@@ -23,35 +25,39 @@ public class TeacherDAOImpl implements TeacherDAO{
 	@Autowired
 	private EntityManager entityManager;
 	
-	
 	@Override
-	public Optional<Teacher> getTeacherById(long teacherId) {
+	public Optional<Teacher> findTeacherById(long teacherId) {
 		Session currentSess = entityManager.unwrap(Session.class);
 		String hibernateQuery = 
 				"from Teacher t where t.id = :teacherId";
 		TypedQuery<Teacher> query = currentSess.createQuery(hibernateQuery, Teacher.class); 
 		query.setParameter("teacherId", teacherId);
-		List<Teacher> resultList = query.getResultList();
+		Teacher teacher = query.getSingleResult();
+		/*List<Teacher> resultList = query.getResultList();
 		if (resultList.isEmpty())
 			return Optional.empty();
-		
-		return Optional.of(resultList.get(0));
+		*/
+		return Optional.ofNullable(teacher);
 	}
 	
-	
-	@Override
-	public boolean checksTeacherExistsWithUsernameAndPassword(String name, String password) {
+	/*@Override
+	public boolean findTeacherByUsername(String name, String password) {
 		Session currentSess = entityManager.unwrap(Session.class);
 		String hibernateQuery = 
-				"from Teacher t where t.name = :name and t.password = :password";
+				"select t from Teacher t where t.surname = :name and t.password = :password";
 		TypedQuery<Teacher> query = currentSess.createQuery(hibernateQuery, Teacher.class);
 		query.setParameter("name", name);
 		query.setParameter("password", password);
 		
-		List<Teacher> resultList = query.getResultList();
-		
-		return !resultList.isEmpty();
-	}
+		Teacher teacher = null;
+		try {
+			teacher = query.getSingleResult();
+		}catch (NoResultException e) {
+			teacher = null;
+		}
+		LOGGER.debug("checksTeacherExistsWithUsernameAndPassword teacher: " + teacher);
+		return !(teacher == null);
+	}*/
 	
 	@Override
 	public void registerNewTeacher(Teacher teacher) {
@@ -83,5 +89,23 @@ public class TeacherDAOImpl implements TeacherDAO{
 			answerImage = (AnswerImage) eachObject;	
 		}
 		return Optional.ofNullable(answerImage);
+	}
+	
+	@Override
+	public Optional<Teacher> findTeacherByUsername(String username){
+		Session currentSess = entityManager.unwrap(Session.class);
+		String hibernateQuery = "select t from Teacher t where t.username = :UserName";
+		TypedQuery<Teacher> query = currentSess.createQuery(hibernateQuery);
+		query.setParameter("UserName", username);
+		Teacher teacher = null;
+		try {
+			teacher = query.getSingleResult();
+		}catch (NonUniqueResultException e) {
+			LOGGER.error("findTeacherByUsername didn't return one result which should have been. Look this method");
+		} catch (NoResultException e) {
+			LOGGER.error("findTeacherByUsername didn't found a record with that username which could be possible");
+		}
+		
+		return Optional.ofNullable(teacher);
 	}
 }

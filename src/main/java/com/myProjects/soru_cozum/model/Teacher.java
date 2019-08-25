@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 @Table(name = "SS_TEACHERS")
 public class Teacher {
 	private final static Logger LOGGER = LoggerFactory.getLogger(Teacher.class);
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "TEACHER_ID")
@@ -38,6 +38,9 @@ public class Teacher {
 
 	@Column(name = "PASSWORD")
 	private String password;
+
+	@Column(name = "USERNAME")
+	private String username;
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST,
 			CascadeType.REFRESH })
@@ -114,6 +117,14 @@ public class Teacher {
 		this.answerAudioSet = answerAudioSet;
 	}
 
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
 	public void addImageToTeacher(AnswerImage answerImage) {
 		if (answerImageSet == null)
 			answerImageSet = new TreeSet<AnswerImage>();
@@ -144,5 +155,10 @@ public class Teacher {
 		LOGGER.debug("Adding new updated answer image: " + newAnswerImage);
 		answerImageSet.add(newAnswerImage);
 		newAnswerImage.setTeacher(this);
+	}
+	
+	@Override
+	public String toString() {
+		return "Id: " + id + " username: " + username + " name: " + name;
 	}
 }

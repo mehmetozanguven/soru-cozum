@@ -1,9 +1,7 @@
 package com.myProjects.soru_cozum.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -14,15 +12,16 @@ import org.springframework.stereotype.Service;
 
 import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Question;
-import com.myProjects.soru_cozum.model.QuestionImage;
 import com.myProjects.soru_cozum.model.Student;
-import com.myProjects.soru_cozum.repository.PublisherDAO;
 import com.myProjects.soru_cozum.repository.StudentDAO;
-import com.myProjects.soru_cozum.repository.StudentDAOImpl;
 import com.myProjects.soru_cozum.request.NewRegisterRequestForStudent;
 import com.myProjects.soru_cozum.response.StudentQuestionAnswerResponse;
 import com.myProjects.soru_cozum.service.jsonService.StudentJSONService;
-
+/***
+ * 
+ * @author mehmetozanguven
+ *
+ */
 @Service
 @Transactional
 public class StudentServiceImpl implements StudentService{
@@ -57,19 +56,26 @@ public class StudentServiceImpl implements StudentService{
 		student.addQuestionToStudent(question);
 		studentDAO.updateStudent(student);
 	}
-
+	
+	/**
+	 * Persist the student to database
+	 */
 	@Override
 	public Long registerNewStudent(Student student) {
 		Long studentId = studentDAO.registerNewStudent(student);
 		return studentId;
 	}
 	
+	/***
+	 * Doesn't persist to database
+	 */
 	@Override
 	public Student createStudentFromRequest(NewRegisterRequestForStudent newRegisterRequest) {
 		Student newStudent = new Student();
 		newStudent.setName(newRegisterRequest.getStudentName());
 		newStudent.setPassword(newRegisterRequest.getStudentPassword());
 		newStudent.setSurname(newRegisterRequest.getSurname());
+		newStudent.setUsername(newRegisterRequest.getUsername());
 		return newStudent;
 	}
 
@@ -101,5 +107,19 @@ public class StudentServiceImpl implements StudentService{
 	public boolean checkStudentExistsWithUsernameAndPassword(String studentName, String studentPassword) {
 		return studentDAO.checkStudentExistsWithUsernameAndPassword(studentName, studentPassword);
 	}
+	
+	@Override
+	public Student findByUsernameAndPassword(String username, String password) {
+		Optional<Student> student = studentDAO.findByUsernameAndPassword(username, password);
+		return student.orElse(new Student("nonce"));
+	}
+
+	@Override
+	public Optional<Student> findByUsername(String username) {
+		Optional<Student> student = studentDAO.findByUsername(username);
+		return student;
+	}
+	
+	
 	
 }

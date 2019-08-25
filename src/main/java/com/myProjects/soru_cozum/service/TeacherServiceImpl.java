@@ -27,6 +27,7 @@ import com.myProjects.soru_cozum.model.json.StudentJSON;
 import com.myProjects.soru_cozum.repository.AnswerDAO;
 import com.myProjects.soru_cozum.repository.TeacherDAO;
 import com.myProjects.soru_cozum.request.AnswerQuestionRequest;
+import com.myProjects.soru_cozum.request.NewRegisterRequestForTeacher;
 
 @Service
 @Transactional
@@ -40,8 +41,8 @@ public class TeacherServiceImpl implements TeacherService{
 	private AnswerDAO answerDAO;
 	
 	@Override
-	public Teacher getTeacherById(long teacherId) {
-		Optional<Teacher> teacher = teacherDAO.getTeacherById(teacherId);
+	public Teacher findTeacherById(long teacherId) {
+		Optional<Teacher> teacher = teacherDAO.findTeacherById(teacherId);
 		return teacher.orElse(new Teacher((long) 0));
 	}
 	
@@ -87,16 +88,18 @@ public class TeacherServiceImpl implements TeacherService{
 	
 	
 	@Override
-	public boolean checksTeacherExistsWithUsernameAndPassword(String name, String password) {
-		boolean isTeacherExists = teacherDAO.checksTeacherExistsWithUsernameAndPassword(name, password);
-		return isTeacherExists;
+	public Optional<Teacher> findTeacherByUsername(String username) {
+		Optional<Teacher> teacher = teacherDAO.findTeacherByUsername(username);
+		return teacher;
 	}
 	
 	@Override
-	public Teacher createTeacherFromRequest(String teacherName, String teacherPassword) {
+	public Teacher createTeacherFromRequest(NewRegisterRequestForTeacher registerRequest) {
 		Teacher newTeacher = new Teacher();
-		newTeacher.setName(teacherName);
-		newTeacher.setPassword(teacherPassword);
+		newTeacher.setName(registerRequest.getName());
+		newTeacher.setPassword(registerRequest.getPassword());
+		newTeacher.setUsername(registerRequest.getUsername());
+
 		return newTeacher;
 	}
 	

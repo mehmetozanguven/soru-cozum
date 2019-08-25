@@ -33,7 +33,7 @@ import com.myProjects.soru_cozum.service.TeacherService;
  *
  */
 @RestController
-@RequestMapping("/teacher")
+@RequestMapping("/api/teacher")
 public class TeacherController {
 
 	@Autowired
@@ -59,7 +59,7 @@ public class TeacherController {
 	
 	@GetMapping("/getMyAnsweredQuestion/{teacherId}")
 	public ResponseEntity<?> getAnsweredQuestionByTeacherId(@PathVariable(value = "teacherId") Long teacherId){
-		Teacher teacher = teacherService.getTeacherById(teacherId);
+		Teacher teacher = teacherService.findTeacherById(teacherId);
 		if (teacher.getId() == 0)
 			return new ResponseEntity<>(new AnswerQuestionResponse("ERROR", "Invalid teacher id"), HttpStatus.NOT_FOUND);
 		List<AnsweredQuestionJSON> answerList = teacherService.getAnsweredQuestionByTeacherId(teacher);
@@ -79,7 +79,7 @@ public class TeacherController {
 	 */
 	@PostMapping("/answerQuestion")
 	public ResponseEntity<?> answerQuestion(@RequestBody AnswerQuestionRequest answerQuestionRequest){
-		Teacher teacher = teacherService.getTeacherById(answerQuestionRequest.getTeacherId());
+		Teacher teacher = teacherService.findTeacherById(answerQuestionRequest.getTeacherId());
 		Question question = questionService.findQuestionById(answerQuestionRequest.getQuestionId());
 		
 		TeacherAnswerRequest request = new TeacherAnswerRequest(questionService, teacherService, teacher, question, answerQuestionRequest);
@@ -94,7 +94,7 @@ public class TeacherController {
 	
 	@PostMapping("/updateAnswerImage")
 	public ResponseEntity<?> updateAnswerImage(@RequestBody AnswerQuestionRequest answerQuestionRequest){
-		Teacher teacher = teacherService.getTeacherById(answerQuestionRequest.getTeacherId());
+		Teacher teacher = teacherService.findTeacherById(answerQuestionRequest.getTeacherId());
 		AnswerImage oldAnswerImage = teacherService.getAnswerImageFromTeacher(answerQuestionRequest.getTeacherId(), answerQuestionRequest.getQuestionId());
 		if (oldAnswerImage.getId() == 0)
 			return new ResponseEntity<>("Error happened", HttpStatus.INTERNAL_SERVER_ERROR);

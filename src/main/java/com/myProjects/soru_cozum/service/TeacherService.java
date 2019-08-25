@@ -12,16 +12,16 @@ import com.myProjects.soru_cozum.request.NewRegisterRequestForTeacher;
 
 public interface TeacherService {
 	
-	Teacher getTeacherById(long teacherId);
+	Teacher findTeacherById(long teacherId);
 
 	void resolveTeacherAccordingToAnswerQuestion(Teacher teacher, Question question,
 			AnswerQuestionRequest answerQuestionRequest);
 	
 	List<AnsweredQuestionJSON> getAnsweredQuestionByTeacherId(Teacher teacher);
 
-	boolean checksTeacherExistsWithUsernameAndPassword(String name, String password);
+	Optional<Teacher> findTeacherByUsername(String username);
 
-	Teacher createTeacherFromRequest(String teacherName, String teacherPassword);
+	Teacher createTeacherFromRequest(NewRegisterRequestForTeacher registerRequest);
 
 	void registerNewTeacher(Teacher teacher);
 
