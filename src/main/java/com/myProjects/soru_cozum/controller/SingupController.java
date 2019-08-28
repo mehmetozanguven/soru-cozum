@@ -11,16 +11,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.myProjects.soru_cozum.chainPattern.signup.student.CreateNewStudentDetailsHandler;
 import com.myProjects.soru_cozum.chainPattern.signup.student.CreateNewStudentHandler;
 import com.myProjects.soru_cozum.chainPattern.signup.student.FindStudentByUsernameHandler;
 import com.myProjects.soru_cozum.chainPattern.signup.student.StudentSignupAbstractHandler;
 import com.myProjects.soru_cozum.chainPattern.signup.student.StudentSignupRequest;
+import com.myProjects.soru_cozum.chainPattern.signup.teacher.CreateNewTeacherDetailsHandler;
 import com.myProjects.soru_cozum.chainPattern.signup.teacher.CreateNewTeacherHandler;
 import com.myProjects.soru_cozum.chainPattern.signup.teacher.FindTeacherByUsernameHandler;
 import com.myProjects.soru_cozum.chainPattern.signup.teacher.TeacherSignupAbstractHandler;
 import com.myProjects.soru_cozum.chainPattern.signup.teacher.TeacherSignupRequest;
-import com.myProjects.soru_cozum.request.NewRegisterRequestForStudent;
-import com.myProjects.soru_cozum.request.NewRegisterRequestForTeacher;
+import com.myProjects.soru_cozum.request.GenericSignupRequest;
 import com.myProjects.soru_cozum.service.StudentService;
 import com.myProjects.soru_cozum.service.TeacherService;
 
@@ -45,16 +46,20 @@ public class SingupController {
 	
 	private TeacherSignupAbstractHandler findTeacherByUsernameHandler;
 	private TeacherSignupAbstractHandler createNewTeacherHandler;
+	private TeacherSignupAbstractHandler createNewTeacherDetails;
 	
 	private StudentSignupAbstractHandler findStudentByUsernameHandler;
 	private StudentSignupAbstractHandler createNewStudentHandler;
+	private StudentSignupAbstractHandler createNewStudentDetailsHandler;
 	
 	public SingupController() {
 		findTeacherByUsernameHandler = new FindTeacherByUsernameHandler();
 		createNewTeacherHandler = new CreateNewTeacherHandler();
+		createNewTeacherDetails = new CreateNewTeacherDetailsHandler();
 		
 		findStudentByUsernameHandler = new FindStudentByUsernameHandler();
 		createNewStudentHandler = new CreateNewStudentHandler();
+		createNewStudentDetailsHandler = new CreateNewStudentDetailsHandler();
 	}
 	
 	/**
@@ -66,18 +71,22 @@ public class SingupController {
 	 * @return
 	 */
 	@PostMapping("/student")
-	public ResponseEntity<?> registerNewStudent(@RequestBody NewRegisterRequestForStudent newRegisterRequest){
+	public ResponseEntity<?> registerNewStudent(@RequestBody GenericSignupRequest newRegisterRequest){
+		LOGGER.debug("Register new student");
 		StudentSignupRequest request = new StudentSignupRequest(passwordEncoder, newRegisterRequest, studentService);
-		findStudentByUsernameHandler.setNextHandler(createNewStudentHandler);
+		findStudentByUsernameHandler.setNextHandler(createNewStudentDetailsHandler);
+		createNewStudentDetailsHandler.setNextHandler(createNewStudentHandler);
 		
 		return findStudentByUsernameHandler.handle(request);
 	}
 	
 	
 	@PostMapping("/teacher")
-	public ResponseEntity<?> registerNewTeacher(@RequestBody NewRegisterRequestForTeacher newRegisterRequest){
+	public ResponseEntity<?> registerNewTeacher(@RequestBody GenericSignupRequest newRegisterRequest){
+		LOGGER.debug("Register new teacher");
 		TeacherSignupRequest request = new TeacherSignupRequest(passwordEncoder, newRegisterRequest, teacherService);
-		findTeacherByUsernameHandler.setNextHandler(createNewTeacherHandler);
+		findTeacherByUsernameHandler.setNextHandler(createNewTeacherDetails);
+		createNewTeacherDetails.setNextHandler(createNewTeacherHandler);
 		
 		return findTeacherByUsernameHandler.handle(request);
 	}

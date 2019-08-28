@@ -1,6 +1,5 @@
 package com.myProjects.soru_cozum.model;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -15,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.slf4j.Logger;
@@ -41,6 +41,10 @@ public class Teacher {
 
 	@Column(name = "USERNAME")
 	private String username;
+
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "TEACHER_DETAILS_ID")
+	private TeacherDetails teacherDetails;
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST,
 			CascadeType.REFRESH })
@@ -125,6 +129,14 @@ public class Teacher {
 		this.username = username;
 	}
 
+	public TeacherDetails getTeacherDetails() {
+		return teacherDetails;
+	}
+
+	public void setTeacherDetails(TeacherDetails teacherDetails) {
+		this.teacherDetails = teacherDetails;
+	}
+
 	public void addImageToTeacher(AnswerImage answerImage) {
 		if (answerImageSet == null)
 			answerImageSet = new TreeSet<AnswerImage>();
@@ -156,7 +168,7 @@ public class Teacher {
 		answerImageSet.add(newAnswerImage);
 		newAnswerImage.setTeacher(this);
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Id: " + id + " username: " + username + " name: " + name;

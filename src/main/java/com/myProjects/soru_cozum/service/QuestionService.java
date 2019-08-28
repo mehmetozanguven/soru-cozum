@@ -7,7 +7,7 @@ import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.QuestionImage;
 import com.myProjects.soru_cozum.model.Teacher;
-import com.myProjects.soru_cozum.request.AddQuestionToStudentRequest;
+import com.myProjects.soru_cozum.request.AddQuestionRequest;
 
 public interface QuestionService {
 	

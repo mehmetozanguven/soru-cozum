@@ -15,11 +15,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.myProjects.soru_cozum.enums.Department;
 import com.myProjects.soru_cozum.model.AnswerAudio;
 import com.myProjects.soru_cozum.model.AnswerImage;
 import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.Teacher;
+import com.myProjects.soru_cozum.model.TeacherDetails;
 import com.myProjects.soru_cozum.model.json.AnsweredQuestionJSON;
 import com.myProjects.soru_cozum.model.json.PublisherJSON;
 import com.myProjects.soru_cozum.model.json.QuestionJSON;
@@ -49,8 +51,8 @@ public class TeacherServiceImpl implements TeacherService{
 	@Override
 	public void resolveTeacherAccordingToAnswerQuestion(Teacher teacher, Question question,
 			AnswerQuestionRequest answerQuestionRequest) {
-		tempConvertStringToImageByte(answerQuestionRequest);
-		tempConvertStringToAudioByte(answerQuestionRequest);
+	/*	tempConvertStringToImageByte(answerQuestionRequest);
+		tempConvertStringToAudioByte(answerQuestionRequest);*/
 		
 		AnswerImage answerImage = new AnswerImage();
 		answerImage.setImage(answerQuestionRequest.getImageByte());
@@ -94,16 +96,6 @@ public class TeacherServiceImpl implements TeacherService{
 	}
 	
 	@Override
-	public Teacher createTeacherFromRequest(NewRegisterRequestForTeacher registerRequest) {
-		Teacher newTeacher = new Teacher();
-		newTeacher.setName(registerRequest.getName());
-		newTeacher.setPassword(registerRequest.getPassword());
-		newTeacher.setUsername(registerRequest.getUsername());
-
-		return newTeacher;
-	}
-	
-	@Override
 	public void registerNewTeacher(Teacher teacher) {
 		teacherDAO.registerNewTeacher(teacher);
 	}
@@ -126,9 +118,27 @@ public class TeacherServiceImpl implements TeacherService{
 		teacherDAO.updateTeacher(teacher);
 	}
 	
+	@Override
+	public Teacher createNewTeacher(String name, String password, String username, String surname) {
+		Teacher newTeacher = new Teacher();
+		newTeacher.setName(name);
+		newTeacher.setPassword(password);
+		newTeacher.setUsername(username);
+		newTeacher.setSurname(surname);
+		return newTeacher;
+	}
+	
+	@Override
+	public TeacherDetails createTeacherDetails(String schoolName, Department department) {
+		TeacherDetails newDetails = new TeacherDetails();
+		newDetails.setSchoolName(schoolName);
+		newDetails.setTeacherDepartment(department);
+		return newDetails;
+	}
+	
+	/*
 	
 	/// TEMPORAL METHODS /////
-	
 	private void tempConvertStringToImageByte(AnswerQuestionRequest answerQuestionRequest) {
 		File file = new File(answerQuestionRequest.getImageFilePath());
         byte[] bFile = new byte[(int) file.length()];
@@ -160,6 +170,6 @@ public class TeacherServiceImpl implements TeacherService{
         
         answerQuestionRequest.setAudioByte(bFile);
 	}
-	
+	*/
 	
 }

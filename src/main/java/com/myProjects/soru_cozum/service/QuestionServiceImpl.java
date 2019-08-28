@@ -15,7 +15,7 @@ import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.QuestionImage;
 import com.myProjects.soru_cozum.model.Teacher;
 import com.myProjects.soru_cozum.repository.QuestionDAO;
-import com.myProjects.soru_cozum.request.AddQuestionToStudentRequest;
+import com.myProjects.soru_cozum.request.AddQuestionRequest;
 
 /**
  * 

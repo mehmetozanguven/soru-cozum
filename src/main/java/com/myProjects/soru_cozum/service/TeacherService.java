@@ -3,9 +3,11 @@ package com.myProjects.soru_cozum.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.myProjects.soru_cozum.enums.Department;
 import com.myProjects.soru_cozum.model.AnswerImage;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.Teacher;
+import com.myProjects.soru_cozum.model.TeacherDetails;
 import com.myProjects.soru_cozum.model.json.AnsweredQuestionJSON;
 import com.myProjects.soru_cozum.request.AnswerQuestionRequest;
 import com.myProjects.soru_cozum.request.NewRegisterRequestForTeacher;
@@ -21,7 +23,6 @@ public interface TeacherService {
 
 	Optional<Teacher> findTeacherByUsername(String username);
 
-	Teacher createTeacherFromRequest(NewRegisterRequestForTeacher registerRequest);
 
 	void registerNewTeacher(Teacher teacher);
 
@@ -30,4 +31,8 @@ public interface TeacherService {
 	void updateTeacher(Teacher teacher);
 
 	void updateTeacherAnswerImage(Teacher teacher, AnswerImage oldAnswerImage, AnswerImage newAnswerImage);
+
+	TeacherDetails createTeacherDetails(String schoolName, Department department);
+
+	Teacher createNewTeacher(String name, String password, String username, String surname);
 }

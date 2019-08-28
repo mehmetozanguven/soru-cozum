@@ -2,11 +2,11 @@ package com.myProjects.soru_cozum.request;
 
 public class NewRegisterRequestForStudent {
 	
-	private String studentName;
-	private String studentPassword;
 	private String username;
+	private String name;
+	private String password;
 	private String surname;
-
+	
 	
 	public String getUsername() {
 		return username;
@@ -15,16 +15,16 @@ public class NewRegisterRequestForStudent {
 		this.username = username;
 	}
 	public String getStudentName() {
-		return studentName;
+		return name;
 	}
 	public void setStudentName(String studentName) {
-		this.studentName = studentName;
+		this.name = studentName;
 	}
 	public String getStudentPassword() {
-		return studentPassword;
+		return password;
 	}
 	public void setStudentPassword(String studentPassword) {
-		this.studentPassword = studentPassword;
+		this.password = studentPassword;
 	}
 	public String getSurname() {
 		return surname;

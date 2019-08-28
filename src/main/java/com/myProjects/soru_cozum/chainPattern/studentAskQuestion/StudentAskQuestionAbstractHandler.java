@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import com.myProjects.soru_cozum.enums.QuestionCategory;
 import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Question;
-import com.myProjects.soru_cozum.request.AddQuestionToStudentRequest;
+import com.myProjects.soru_cozum.request.AddQuestionRequest;
 import com.myProjects.soru_cozum.service.QuestionService;
 
 public abstract class StudentAskQuestionAbstractHandler {
@@ -25,13 +25,12 @@ public abstract class StudentAskQuestionAbstractHandler {
 		return this.nextHandler;
 	}
 	
-	public Question createNewQuestion(AddQuestionToStudentRequest addQuestionToStudentRequest, boolean isNewPublisher,
+	public Question createNewQuestion(AddQuestionRequest addQuestionToStudentRequest, boolean isNewPublisher,
 			Publisher newPublisher, QuestionService questionService) {
 		int pageNumber = addQuestionToStudentRequest.getPageNumber();
 		int questionNumber = addQuestionToStudentRequest.getQuestionNumber();
 		QuestionCategory questionCategory = addQuestionToStudentRequest.getQuestionCategory();
 		String questionSubCategory = addQuestionToStudentRequest.getQuestionSubCategory();
-		tempConvertStringToImageByte(addQuestionToStudentRequest);
 		byte[] questionImageByte = addQuestionToStudentRequest.getImageByte();
 
 		Question newQuestion = questionService.createNewQuestionWithCommonProperties(pageNumber, questionNumber,
@@ -41,7 +40,7 @@ public abstract class StudentAskQuestionAbstractHandler {
 		return newQuestion;
 
 	}
-
+/*
 	private void tempConvertStringToImageByte(AddQuestionToStudentRequest addQuestionToStudentRequest) {
 		File file = new File(addQuestionToStudentRequest.getFilePath());
 		byte[] bFile = new byte[(int) file.length()];
@@ -58,5 +57,5 @@ public abstract class StudentAskQuestionAbstractHandler {
 		addQuestionToStudentRequest.setImageByte(bFile);
 
 	}
-	
+	*/
 }

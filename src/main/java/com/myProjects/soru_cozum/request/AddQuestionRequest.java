@@ -2,32 +2,38 @@ package com.myProjects.soru_cozum.request;
 
 
 
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.myProjects.soru_cozum.enums.QuestionCategory;
 import com.myProjects.soru_cozum.model.Publisher;
 
-public class AddQuestionToStudentRequest {
+public class AddQuestionRequest {
 	@JsonAlias({"StudentId"})
 	private Long studentId;
 	
+	@NotNull
 	@JsonAlias("Publisher")
 	private Publisher publisher;
 	
+	@NotNull
 	@JsonAlias("PageNumber")
 	private int pageNumber;
 	
+	@NotNull
 	@JsonAlias("QuestionNumber")
 	private int questionNumber;
 	
-	//@JsonAlias("ImageByte")
-	@JsonIgnore
+	@JsonAlias("ImageByte")
+//	@JsonIgnore
 	private byte[] imageByte;
 	
 	// temporal, delete when unnecessary
-	@JsonAlias("ImageByte")
-	private String filePath;
+/*	@JsonAlias("ImageByte")
+	private String filePath;*/
 	
+	@NotNull
 	@JsonAlias("QuestionCategory")
 	private QuestionCategory questionCategory;
 	
@@ -35,13 +41,13 @@ public class AddQuestionToStudentRequest {
 	@JsonAlias("QuestionSubCategory")
 	private String questionSubCategory;
 	
-	public String getFilePath() {
+/*	public String getFilePath() {
 		return filePath;
 	}
 
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
-	}
+	}*/
 
 	public void setPublisher(Publisher publisher) {
 		this.publisher = publisher;

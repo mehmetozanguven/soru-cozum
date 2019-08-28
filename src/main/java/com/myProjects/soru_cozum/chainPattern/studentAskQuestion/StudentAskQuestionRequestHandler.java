@@ -1,7 +1,7 @@
 package com.myProjects.soru_cozum.chainPattern.studentAskQuestion;
 
 import com.myProjects.soru_cozum.model.*;
-import com.myProjects.soru_cozum.request.AddQuestionToStudentRequest;
+import com.myProjects.soru_cozum.request.AddQuestionRequest;
 import com.myProjects.soru_cozum.service.PublisherService;
 import com.myProjects.soru_cozum.service.QuestionService;
 import com.myProjects.soru_cozum.service.StudentService;
@@ -10,7 +10,7 @@ public class StudentAskQuestionRequestHandler {
 	private Student student;
 	private Publisher publisher;
 
-	private AddQuestionToStudentRequest addQuestionToStudentRequest;
+	private AddQuestionRequest addQuestionToStudentRequest;
 	private StudentService studentService;
 	private QuestionService questionService;
 	private PublisherService publisherService;
@@ -34,10 +34,10 @@ public class StudentAskQuestionRequestHandler {
 	public void setPublisher(Publisher publisher) {
 		this.publisher = publisher;
 	}
-	public AddQuestionToStudentRequest getAddQuestionToStudentRequest() {
+	public AddQuestionRequest getAddQuestionToStudentRequest() {
 		return addQuestionToStudentRequest;
 	}
-	public void setAddQuestionToStudentRequest(AddQuestionToStudentRequest addQuestionToStudentRequest) {
+	public void setAddQuestionToStudentRequest(AddQuestionRequest addQuestionToStudentRequest) {
 		this.addQuestionToStudentRequest = addQuestionToStudentRequest;
 	}
 	public StudentService getStudentService() {

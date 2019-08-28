@@ -4,6 +4,7 @@ package com.myProjects.soru_cozum.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.StudentAskThatQ
 import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.StudentExistsHandler;
 import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Student;
-import com.myProjects.soru_cozum.request.AddQuestionToStudentRequest;
+import com.myProjects.soru_cozum.request.AddQuestionRequest;
 import com.myProjects.soru_cozum.response.AddQuestionToStudentErrorResponse;
 import com.myProjects.soru_cozum.response.StudentQuestionAnswerResponse;
 import com.myProjects.soru_cozum.service.PublisherService;
@@ -124,7 +125,7 @@ public class StudentController {
 	 * @return
 	 */
 	@PostMapping("/addQuestionToStudent")
-	public ResponseEntity<?> addQuestionToStudent(@RequestBody AddQuestionToStudentRequest addQuestionToStudentRequest){
+	public ResponseEntity<?> addQuestionToStudent(@Valid @RequestBody AddQuestionRequest addQuestionToStudentRequest){
 		LOGGER.debug("Student will add new Question in his list");
 		Student student = studentService.findById((long)addQuestionToStudentRequest.getStudentId());
 		Publisher publisher = publisherService.findById((long) addQuestionToStudentRequest.getPublisher().getId());

@@ -13,18 +13,20 @@ public class AnswerQuestionRequest {
 	@JsonAlias("QuestionId")
 	private Long questionId;
 	
-	@JsonIgnore
+	@JsonAlias("ImageByte")
+//	@JsonIgnore
 	private byte[] imageByte;
 	
+	@JsonAlias("AudioByte")
 	@JsonIgnore
 	private byte[] audioByte;
 	
 	// temporal, delete when unnecessary
-	@JsonAlias("ImageByte")
+/*	@JsonAlias("ImageByte")
 	private String imageFilePath;
 	
 	@JsonAlias("AudioByte")
-	private String audioFilePath;
+	private String audioFilePath;*/
 
 	
 	
@@ -61,7 +63,7 @@ public class AnswerQuestionRequest {
 	}
 
 	
-
+/*
 	public String getImageFilePath() {
 		return imageFilePath;
 	}
@@ -77,6 +79,6 @@ public class AnswerQuestionRequest {
 	public void setAudioFilePath(String audioFilePath) {
 		this.audioFilePath = audioFilePath;
 	}
-	
+	*/
 	
 }
