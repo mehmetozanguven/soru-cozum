@@ -29,3 +29,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Don't Include Files & Videos ###
+/Questions/**
+/Answers/**
