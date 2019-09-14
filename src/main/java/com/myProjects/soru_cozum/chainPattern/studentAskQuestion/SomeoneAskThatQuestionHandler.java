@@ -16,12 +16,7 @@ public class SomeoneAskThatQuestionHandler extends StudentAskQuestionAbstractHan
 	@Override
 	public ResponseEntity<?> handle(StudentAskQuestionRequest request) {
 		LOGGER.debug("4. Checking another student ask the question or not");
-		LOGGER.debug("\tQuestion properties:");
-		LOGGER.debug("\tStudent Id: " + request.getStudent().getId());
-		LOGGER.debug("\tPublisher Id: " + request.getPublisher().getId());
-		LOGGER.debug("\tPage number of question: " + request.getAddQuestionToStudentRequest().getPageNumber());
-		LOGGER.debug("\tQuestion number of question: " + request.getAddQuestionToStudentRequest().getQuestionNumber());
-		
+			
 		Question isQuestionAskedBySomeone = request.getQuestionService().findQuestionByPageNumberQuestionNumberPublisher(
 				request.getAddQuestionToStudentRequest().getPageNumber(), request.getAddQuestionToStudentRequest().getQuestionNumber(),
 				request.getAddQuestionToStudentRequest().getPublisher());

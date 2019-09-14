@@ -1,11 +1,9 @@
 package com.myProjects.soru_cozum.service;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 
 import org.slf4j.Logger;
@@ -15,9 +13,12 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.myProjects.soru_cozum.chainPattern.fileStorage.DirectoryHandler;
+import com.myProjects.soru_cozum.chainPattern.fileStorage.FileCreatorHandler;
+import com.myProjects.soru_cozum.chainPattern.fileStorage.FileStorageAbstractHandler;
+import com.myProjects.soru_cozum.chainPattern.fileStorage.FileStorageRequest;
 import com.myProjects.soru_cozum.enums.StoreType;
 
 @Service
@@ -26,15 +27,26 @@ public class FileStorageServiceImpl implements FileStorageService {
 	
 	
 	private Path teacherFileStorageLocation;
+	private Path teacherRelativeFileStorageLocation;
 	private Path studentFileStorageLocation;
+	private Path studentRelativeFileStorageLocaltion;
 	
+	private FileStorageAbstractHandler fileCreatorHandler;
+	private FileStorageAbstractHandler directoryHandler;
+
+
 	@Autowired
     public FileStorageServiceImpl(Environment environment) {
+		this.fileCreatorHandler = new FileCreatorHandler();
+		this.directoryHandler = new DirectoryHandler();
+		
 		LOGGER.debug(environment.getProperty("file.uploadStudentDir"));
         this.teacherFileStorageLocation = Paths.get(environment.getProperty("file.uploadTeacherDir"))
                 .toAbsolutePath().normalize();
+        this.teacherRelativeFileStorageLocation = Paths.get(environment.getProperty("file.uploadTeacherDir")).normalize();
         this.studentFileStorageLocation = Paths.get(environment.getProperty("file.uploadStudentDir"))
                 .toAbsolutePath().normalize();
+        this.studentRelativeFileStorageLocaltion = Paths.get(environment.getProperty("file.uploadStudentDir")).normalize();
         LOGGER.info("student file storage: " + studentFileStorageLocation);
 		LOGGER.info("teacher file storage: " + teacherFileStorageLocation);
 
@@ -48,33 +60,27 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 	
 	@Override
-	public String storeFile(MultipartFile file, StoreType types, Long studentId, String studentUsername) {
+	public String storeFile(MultipartFile file, 
+							StoreType types, 
+							String studentUsername,
+							Long studentId, 
+							Long pageNumber,
+							Long questionNumber,
+							Long publisherId) {
 		if (types == null)
 			return "Sorry, types parameter is null";
+		LOGGER.info("Check user has a folder. Folder name: " + studentId + "_" + studentUsername);
 		
-		String fileName = StringUtils.cleanPath(studentId + "!" + studentUsername + "/" + file.getOriginalFilename());
-		try {
-			// Check if the file's name contains invalid characters
-			if (fileName.contains("..")) {
-				LOGGER.error("Filename contains invalid path sequence");
-				return "Sorry! Filename contains invalid path sequence ";
-			}
+		Path studentFolder = this.studentRelativeFileStorageLocaltion.resolve(studentId + "_" + studentUsername);
+		Path publishFolder = studentFolder.resolve(String.valueOf(publisherId));
 
-			// Copy file to the target location (Replacing existing file with the same name)
-			Path targetLocation = null;
-			if (types == StoreType.STUDENT_QUESTION)
-				targetLocation = this.studentFileStorageLocation.resolve(fileName);
-			else if (types == StoreType.TEACHER_ANSWER_IMAGE)
-				targetLocation = this.teacherFileStorageLocation.resolve("/image/" + fileName);
-			else
-				targetLocation = this.teacherFileStorageLocation.resolve("/video/" + fileName);
-			Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+		FileStorageRequest handlerRequest = new FileStorageRequest(file, types, studentUsername, studentId, pageNumber, questionNumber, publisherId);
+		handlerRequest.setStudentFolder(studentFolder);
+		handlerRequest.setPublisherSubFolder(publishFolder);
+		
+		directoryHandler.setNextHandler(fileCreatorHandler);
 
-			return fileName;
-		} catch (IOException ex) {
-			LOGGER.error("Can't store the file, exception: " + ex.getMessage());
-			return "Sorry!, Could not store file ";
-		}
+		return directoryHandler.handle(handlerRequest);
 	}
 	
 	@Override
