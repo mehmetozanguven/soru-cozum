@@ -1,6 +1,7 @@
 package com.myProjects.soru_cozum.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,19 +13,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.myProjects.soru_cozum.chainPattern.teacherAnswer.AnswerQuestionHandler;
-import com.myProjects.soru_cozum.chainPattern.teacherAnswer.QuestionExistsHandler;
-import com.myProjects.soru_cozum.chainPattern.teacherAnswer.TeacherAnswerAbstractHandler;
-import com.myProjects.soru_cozum.chainPattern.teacherAnswer.TeacherAnswerRequest;
-import com.myProjects.soru_cozum.chainPattern.teacherAnswer.TeacherExistsHandler;
+import com.myProjects.soru_cozum.chainPattern.teacher.answer.AnswerQuestionHandler;
+import com.myProjects.soru_cozum.chainPattern.teacher.answer.QuestionExistsHandler;
+import com.myProjects.soru_cozum.chainPattern.teacher.answer.TeacherAnswerAbstractHandler;
+import com.myProjects.soru_cozum.chainPattern.teacher.answer.TeacherAnswerRequest;
+import com.myProjects.soru_cozum.chainPattern.teacher.answer.TeacherExistsHandler;
+import com.myProjects.soru_cozum.chainPattern.teacher.updateAnswer.TeacherOldAnswerAudioHandler;
+import com.myProjects.soru_cozum.chainPattern.teacher.updateAnswer.TeacherOldAnswerImageHandler;
+import com.myProjects.soru_cozum.chainPattern.teacher.updateAnswer.TeacherUpdateAnswerAbstactHandler;
+import com.myProjects.soru_cozum.chainPattern.teacher.updateAnswer.TeacherUpdateAnswerRequest;
+import com.myProjects.soru_cozum.chainPattern.teacher.updateAnswer.UpdateAnswerHandler;
 import com.myProjects.soru_cozum.enums.QuestionCategory;
-import com.myProjects.soru_cozum.model.AnswerImage;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.QuestionImage;
 import com.myProjects.soru_cozum.model.Teacher;
 import com.myProjects.soru_cozum.model.json.AnsweredQuestionJSON;
 import com.myProjects.soru_cozum.request.AnswerQuestionRequest;
-import com.myProjects.soru_cozum.response.AnswerQuestionResponse;
+import com.myProjects.soru_cozum.response.GenericResponse;
+import com.myProjects.soru_cozum.response.TeacherResponse;
 import com.myProjects.soru_cozum.service.QuestionService;
 import com.myProjects.soru_cozum.service.TeacherService;
 
@@ -42,6 +48,26 @@ public class TeacherController {
 	@Autowired
 	private TeacherService teacherService;
 	
+	private TeacherAnswerAbstractHandler teacherExists;
+	private TeacherAnswerAbstractHandler questionExists;
+	private TeacherAnswerAbstractHandler answerQuestion;
+	
+	private TeacherUpdateAnswerAbstactHandler teacherExists_updateHandler;
+	private TeacherUpdateAnswerAbstactHandler oldAnswerImageHandler;
+	private TeacherUpdateAnswerAbstactHandler oldAnswerAudioHandler;
+	private TeacherUpdateAnswerAbstactHandler updateAnswerHandler;
+	
+	public TeacherController() {
+		teacherExists = new TeacherExistsHandler();
+		questionExists = new QuestionExistsHandler();
+		answerQuestion = new AnswerQuestionHandler();
+		
+		teacherExists_updateHandler = new com.myProjects.soru_cozum.chainPattern.teacher.updateAnswer.TeacherExistsHandler();
+		oldAnswerImageHandler = new TeacherOldAnswerImageHandler();
+		oldAnswerAudioHandler = new TeacherOldAnswerAudioHandler();
+		updateAnswerHandler = new UpdateAnswerHandler();
+	}
+
 	@GetMapping("/allQuestion/{categoryName}")
 	public ResponseEntity<?> getAllNonAnsweredQuestionBySpecificType(@PathVariable("categoryName") QuestionCategory questionCategory){
 		List<Question> allSpecificQuestions = questionService.getAllNonAnsweredQuestionsBySpecificType(questionCategory);
@@ -51,18 +77,26 @@ public class TeacherController {
 	@GetMapping("/getQuestionImage/{questionId}")
 	public ResponseEntity<?> getQuestionImageByQuestionId(@PathVariable("questionId") Long questionId){
 		QuestionImage questionImage = questionService.getQuestionImageByQuestionId(questionId);
-		if (questionImage.getId() == 0)
-			return new ResponseEntity<>(new AnswerQuestionResponse("ERROR", "Invalid question image id"), HttpStatus.NOT_FOUND);
+		if (questionImage.getId() == 0) {
+			GenericResponse<TeacherResponse> response = new GenericResponse<TeacherResponse>();
+			response.setStatu("Error");
+			response.setInformation(new TeacherResponse("Invalid question image id"));
+			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+		}
 		else
 			return ResponseEntity.ok().body(questionImage);
 	}
 	
 	@GetMapping("/getMyAnsweredQuestion/{teacherId}")
 	public ResponseEntity<?> getAnsweredQuestionByTeacherId(@PathVariable(value = "teacherId") Long teacherId){
-		Teacher teacher = teacherService.findTeacherById(teacherId);
-		if (teacher.getId() == 0)
-			return new ResponseEntity<>(new AnswerQuestionResponse("ERROR", "Invalid teacher id"), HttpStatus.NOT_FOUND);
-		List<AnsweredQuestionJSON> answerList = teacherService.getAnsweredQuestionByTeacherId(teacher);
+		Optional<Teacher> teacher = teacherService.findTeacherById(teacherId);
+		if (!teacher.isPresent()) {
+			GenericResponse<TeacherResponse> response = new GenericResponse<TeacherResponse>();
+			response.setStatu("Error");
+			response.setInformation(new TeacherResponse("Invalid Teacher id"));
+			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+		}
+		List<AnsweredQuestionJSON> answerList = teacherService.getAnsweredQuestionByTeacherId(teacher.get());
 		return new ResponseEntity<>(answerList, HttpStatus.OK);
 	}
 	
@@ -79,23 +113,35 @@ public class TeacherController {
 	 */
 	@PostMapping("/answerQuestion")
 	public ResponseEntity<?> answerQuestion(@RequestBody AnswerQuestionRequest answerQuestionRequest){
-		Teacher teacher = teacherService.findTeacherById(answerQuestionRequest.getTeacherId());
+		Optional<Teacher> teacher = teacherService.findTeacherById(answerQuestionRequest.getTeacherId());
+		if (!teacher.isPresent()) {
+			GenericResponse<TeacherResponse> response = new GenericResponse<TeacherResponse>();
+			response.setStatu("Error");
+			response.setInformation(new TeacherResponse("Invalid Teacher id"));
+			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+		}
+		
 		Question question = questionService.findQuestionById(answerQuestionRequest.getQuestionId());
 		
-		TeacherAnswerRequest request = new TeacherAnswerRequest(questionService, teacherService, teacher, question, answerQuestionRequest);
+		TeacherAnswerRequest request = new TeacherAnswerRequest(questionService, teacherService, teacher.get(), question, answerQuestionRequest);
 		
-		TeacherAnswerAbstractHandler teacherExists = new TeacherExistsHandler();
-		TeacherAnswerAbstractHandler questionExists = new QuestionExistsHandler();
-		TeacherAnswerAbstractHandler answerQuestion = new AnswerQuestionHandler();
 		teacherExists.setNextHandler(questionExists);
 		questionExists.setNextHandler(answerQuestion);
 		return teacherExists.handle(request);
 	}
 	
-	@PostMapping("/updateAnswerImage")
-	public ResponseEntity<?> updateAnswerImage(@RequestBody AnswerQuestionRequest answerQuestionRequest){
-		Teacher teacher = teacherService.findTeacherById(answerQuestionRequest.getTeacherId());
-		AnswerImage oldAnswerImage = teacherService.getAnswerImageFromTeacher(answerQuestionRequest.getTeacherId(), answerQuestionRequest.getQuestionId());
+	@PostMapping("/updateAnswer")
+	public ResponseEntity<?> updateAnswer(@RequestBody AnswerQuestionRequest answerQuestionRequest){
+		TeacherUpdateAnswerRequest request = new TeacherUpdateAnswerRequest(teacherService, answerQuestionRequest);
+		
+		teacherExists_updateHandler.setNextHandler(oldAnswerImageHandler);
+		oldAnswerImageHandler.setNextHandler(oldAnswerAudioHandler);
+		oldAnswerAudioHandler.setNextHandler(updateAnswerHandler);
+		
+		return teacherExists_updateHandler.handle(request);
+		
+	/*	Teacher teacher = teacherService.findTeacherById(answerQuestionRequest.getTeacherId());
+		AnswerImage oldAnswerImage = teacherService.findAnswerImageFromTeacher(answerQuestionRequest.getTeacherId(), answerQuestionRequest.getQuestionId());
 		if (oldAnswerImage.getId() == 0)
 			return new ResponseEntity<>("Error happened", HttpStatus.INTERNAL_SERVER_ERROR);
 		
@@ -105,7 +151,7 @@ public class TeacherController {
 		
 		teacherService.updateTeacherAnswerImage(teacher, oldAnswerImage, newAnswerImage);
 		
-		return new ResponseEntity<>("You changed your answer", HttpStatus.OK);
+		return new ResponseEntity<>("You changed your answer", HttpStatus.OK);*/
 	}
 	
 	

@@ -2,10 +2,11 @@ package com.myProjects.soru_cozum.chainPattern.studentAskQuestion;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.myProjects.soru_cozum.model.Question;
-import com.myProjects.soru_cozum.response.AddQuestionToStudentErrorResponse;
+import com.myProjects.soru_cozum.response.StudentAskQuestionResponse;
 
 
 public class SomeoneAskThatQuestionHandler extends StudentAskQuestionAbstractHandler{
@@ -13,7 +14,7 @@ public class SomeoneAskThatQuestionHandler extends StudentAskQuestionAbstractHan
 	private static final Logger LOGGER = LoggerFactory.getLogger(SomeoneAskThatQuestionHandler.class);
 	
 	@Override
-	public ResponseEntity<?> handle(StudentAskQuestionRequestHandler request) {
+	public ResponseEntity<?> handle(StudentAskQuestionRequest request) {
 		LOGGER.debug("4. Checking another student ask the question or not");
 		LOGGER.debug("\tQuestion properties:");
 		LOGGER.debug("\tStudent Id: " + request.getStudent().getId());
@@ -30,8 +31,11 @@ public class SomeoneAskThatQuestionHandler extends StudentAskQuestionAbstractHan
 			request.getStudentService().addQuestionToStudent(request.getStudent(), isQuestionAskedBySomeone);
 			LOGGER.debug("Update student without adding new Question !!!!");
 			request.getStudentService().addQuestionToStudentWithoutCreatingNewQuestion(isQuestionAskedBySomeone, request.getStudent());
-			return ResponseEntity.ok()
-					.body(new AddQuestionToStudentErrorResponse("Success", "Question already have been asked by someone, we added to your list"));
+			
+			getResponse().setStatu("Success");
+			getResponse().setInformation(new StudentAskQuestionResponse("Question already have been asked by someone, we added to your list"));
+			return new ResponseEntity<>(getResponse(), HttpStatus.OK);
+
 		}else {
 			LOGGER.debug("No one asked that question before, then go to next cycle -New Question-");
 			return getNextHandler().handle(request);

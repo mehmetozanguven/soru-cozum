@@ -1,4 +1,4 @@
-package com.myProjects.soru_cozum.chainPattern.teacherAnswer;
+package com.myProjects.soru_cozum.chainPattern.teacher.answer;
 
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.Teacher;

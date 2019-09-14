@@ -7,32 +7,38 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.myProjects.soru_cozum.model.Teacher;
+import com.myProjects.soru_cozum.response.SignupResponse;
 
-public class CreateNewTeacherHandler extends TeacherSignupAbstractHandler{
-	
+public class CreateNewTeacherHandler extends TeacherSignupAbstractHandler {
+
 	private final Logger LOGGER = LoggerFactory.getLogger(CreateNewTeacherHandler.class);
-	
+
 	@Override
 	public ResponseEntity<?> handle(TeacherSignupRequest request) {
 		PasswordEncoder encoder = request.getPasswordEncoder();
 		request.getNewRegisterRequest().setPassword(encoder.encode(request.getNewRegisterRequest().getPassword()));
-		
+
 		String name = request.getNewRegisterRequest().getName();
 		String password = request.getNewRegisterRequest().getPassword();
 		String username = request.getNewRegisterRequest().getUsername();
 		String surname = request.getNewRegisterRequest().getSurname();
-		
+
 		Teacher newTeacher = request.getTeacherService().createNewTeacher(name, password, username, surname);
-		
+
 		if (request.getTeacherDetails() == null)
 			LOGGER.debug("Request has no body about details. Won't be set");
 		else
 			newTeacher.setTeacherDetails(request.getTeacherDetails());
-		
+
 		request.getTeacherService().registerNewTeacher(newTeacher);
-		
-		return ResponseEntity.status(HttpStatus.OK).body(newTeacher);
+
+		getResponse().setStatu("Success");
+		SignupResponse<Teacher> signupResponse = new SignupResponse<Teacher>("New teacher created");
+		signupResponse.setNewRegister(newTeacher);
+		getResponse().setInformation(signupResponse);
+
+		return new ResponseEntity<>(getResponse(), HttpStatus.OK);
+
 	}
-	
-	
+
 }

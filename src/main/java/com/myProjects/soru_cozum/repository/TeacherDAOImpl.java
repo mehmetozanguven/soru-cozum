@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.myProjects.soru_cozum.model.AnswerAudio;
 import com.myProjects.soru_cozum.model.AnswerImage;
 import com.myProjects.soru_cozum.model.Teacher;
 
@@ -33,31 +34,9 @@ public class TeacherDAOImpl implements TeacherDAO{
 		TypedQuery<Teacher> query = currentSess.createQuery(hibernateQuery, Teacher.class); 
 		query.setParameter("teacherId", teacherId);
 		Teacher teacher = query.getSingleResult();
-		/*List<Teacher> resultList = query.getResultList();
-		if (resultList.isEmpty())
-			return Optional.empty();
-		*/
+
 		return Optional.ofNullable(teacher);
 	}
-	
-	/*@Override
-	public boolean findTeacherByUsername(String name, String password) {
-		Session currentSess = entityManager.unwrap(Session.class);
-		String hibernateQuery = 
-				"select t from Teacher t where t.surname = :name and t.password = :password";
-		TypedQuery<Teacher> query = currentSess.createQuery(hibernateQuery, Teacher.class);
-		query.setParameter("name", name);
-		query.setParameter("password", password);
-		
-		Teacher teacher = null;
-		try {
-			teacher = query.getSingleResult();
-		}catch (NoResultException e) {
-			teacher = null;
-		}
-		LOGGER.debug("checksTeacherExistsWithUsernameAndPassword teacher: " + teacher);
-		return !(teacher == null);
-	}*/
 	
 	@Override
 	public void registerNewTeacher(Teacher teacher) {
@@ -72,7 +51,7 @@ public class TeacherDAOImpl implements TeacherDAO{
 	}
 	
 	@Override
-	public Optional<AnswerImage> getAnswerImageFromTeacher(Long teacherId, Long questionId) {
+	public Optional<AnswerImage> findAnswerImageFromTeacher(Long teacherId, Long questionId) {
 		Session currentSess = entityManager.unwrap(Session.class);
 		String hibernateQuery = 
 				"select im from AnswerImage im where im.teacher.id = :teacherId and im.associatedQuestionId = :questionId";
@@ -91,6 +70,28 @@ public class TeacherDAOImpl implements TeacherDAO{
 		return Optional.ofNullable(answerImage);
 	}
 	
+	
+	
+	@Override
+	public Optional<AnswerAudio> findAnswerAudioFromTeacher(Long teacherId, Long questionId) {
+		Session currentSess = entityManager.unwrap(Session.class);
+		String hibernateQuery = 
+				"select im from AnswerAudio im where im.teacher.id = :teacherId and im.associatedQuestionId = :questionId";
+		Query query = currentSess.createQuery(hibernateQuery);
+		query.setParameter("questionId", questionId);
+		query.setParameter("teacherId", teacherId);
+		
+		List<AnswerAudio> resultList = query.getResultList();
+		LOGGER.debug("result List of answered image: " + resultList);
+		
+		AnswerAudio answerAudio = null;
+		for (AnswerAudio eachObject : resultList) {
+			LOGGER.debug("each object: " + eachObject);
+			answerAudio = (AnswerAudio) eachObject;	
+		}
+		return Optional.ofNullable(answerAudio);
+	}
+
 	@Override
 	public Optional<Teacher> findTeacherByUsername(String username){
 		Session currentSess = entityManager.unwrap(Session.class);

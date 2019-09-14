@@ -5,17 +5,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.myProjects.soru_cozum.response.AddQuestionToStudentErrorResponse;
+import com.myProjects.soru_cozum.response.StudentAskQuestionResponse;
 
 public class StudentExistsHandler extends StudentAskQuestionAbstractHandler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(StudentExistsHandler.class);
 	
 	@Override
-	public ResponseEntity<?> handle(StudentAskQuestionRequestHandler request) {
+	public ResponseEntity<?> handle(StudentAskQuestionRequest request) {
 		LOGGER.debug("1. First check student exists or not");
 		if (request.getStudent().getName() == "nonce") {
 			LOGGER.debug("Student not exists");
-			return new ResponseEntity<>(new AddQuestionToStudentErrorResponse("Error", "Invalid Student ID"), HttpStatus.BAD_REQUEST);
+			getResponse().setStatu("Success");
+			getResponse().setInformation(new StudentAskQuestionResponse("Invalid Student ID"));
+			return new ResponseEntity<>(getResponse(), HttpStatus.BAD_REQUEST);
 		}
 		else {
 			LOGGER.debug("Student exists, then go to next cycle -check publisher-");

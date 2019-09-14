@@ -168,6 +168,18 @@ public class Teacher {
 		answerImageSet.add(newAnswerImage);
 		newAnswerImage.setTeacher(this);
 	}
+	
+	public void updateAnswerAudio(AnswerAudio oldAnswerAudio, AnswerAudio newAnswerAudio) {
+		if (answerAudioSet.contains(oldAnswerAudio)) {
+			LOGGER.debug("Answer audio size before deleting: " + answerAudioSet.size());
+			LOGGER.debug("Deleting existing answer image: " + oldAnswerAudio);
+			answerAudioSet.remove(oldAnswerAudio);
+			LOGGER.debug("Answer image size after deleting: " + answerAudioSet.size());
+		}
+		LOGGER.debug("Adding new updated answer image: " + newAnswerAudio);
+		answerAudioSet.add(newAnswerAudio);
+		newAnswerAudio.setTeacher(this);
+	}
 
 	@Override
 	public String toString() {

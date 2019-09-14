@@ -1,6 +1,5 @@
 package com.myProjects.soru_cozum.model;
 
-import java.sql.Blob;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

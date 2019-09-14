@@ -16,7 +16,6 @@ import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.Student;
 import com.myProjects.soru_cozum.model.StudentDetails;
 import com.myProjects.soru_cozum.repository.StudentDAO;
-import com.myProjects.soru_cozum.request.NewRegisterRequestForStudent;
 import com.myProjects.soru_cozum.response.StudentQuestionAnswerResponse;
 import com.myProjects.soru_cozum.service.jsonService.StudentJSONService;
 

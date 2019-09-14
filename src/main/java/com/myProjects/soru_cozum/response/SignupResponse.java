@@ -1,29 +1,27 @@
 package com.myProjects.soru_cozum.response;
 
-public class SignupResponse {
-	private String statu;
-	private String information;
-	
+import com.myProjects.soru_cozum.model.Student;
+
+public class SignupResponse<T>{
+	private String response;
+	private T newRegister;
 	public SignupResponse() {
 		
 	}
-	public SignupResponse(String statu, String information) {
-		super();
-		this.statu = statu;
-		this.information = information;
+	public SignupResponse(String response) {
+		this.response = response;
 	}
-	public String getStatu() {
-		return statu;
+	public String getResponse() {
+		return response;
 	}
-	public void setStatu(String statu) {
-		this.statu = statu;
+	public void setResponse(String response) {
+		this.response = response;
 	}
-	public String getInformation() {
-		return information;
+	public T getNewRegister() {
+		return newRegister;
 	}
-	public void setInformation(String information) {
-		this.information = information;
+	public void setNewRegister(T newRegister) {
+		this.newRegister = newRegister;
 	}
-	
-	
+
 }

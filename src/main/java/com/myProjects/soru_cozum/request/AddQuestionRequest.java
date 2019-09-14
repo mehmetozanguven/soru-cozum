@@ -4,6 +4,8 @@ package com.myProjects.soru_cozum.request;
 
 import javax.validation.constraints.NotNull;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.myProjects.soru_cozum.enums.QuestionCategory;
@@ -25,9 +27,12 @@ public class AddQuestionRequest {
 	@JsonAlias("QuestionNumber")
 	private int questionNumber;
 	
-	@JsonAlias("ImageByte")
-//	@JsonIgnore
-	private byte[] imageByte;
+	@JsonAlias("questionUrl")
+	private String questionUrl;
+	
+//	@JsonAlias("ImageByte")
+////	@JsonIgnore
+//	private MultipartFile imageByte;
 	
 	// temporal, delete when unnecessary
 /*	@JsonAlias("ImageByte")
@@ -61,13 +66,13 @@ public class AddQuestionRequest {
 		this.studentId = studentId;
 	}
 
-	public byte[] getImageByte() {
-		return imageByte;
-	}
-
-	public void setImageByte(byte[] imageByte) {
-		this.imageByte = imageByte;
-	}
+//	public MultipartFile getImageByte() {
+//		return imageByte;
+//	}
+//
+//	public void setImageByte(MultipartFile imageByte) {
+//		this.imageByte = imageByte;
+//	}
 
 	public Publisher getPublisher() {
 		return publisher;
@@ -107,6 +112,14 @@ public class AddQuestionRequest {
 
 	public void setQuestionSubCategory(String questionSubCategory) {
 		this.questionSubCategory = questionSubCategory;
+	}
+
+	public String getQuestionUrl() {
+		return questionUrl;
+	}
+
+	public void setUrl(String url) {
+		this.questionUrl = url;
 	}
 	
 	

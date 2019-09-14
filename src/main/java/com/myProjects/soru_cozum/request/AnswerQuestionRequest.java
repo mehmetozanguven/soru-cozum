@@ -18,7 +18,7 @@ public class AnswerQuestionRequest {
 	private byte[] imageByte;
 	
 	@JsonAlias("AudioByte")
-	@JsonIgnore
+//	@JsonIgnore
 	private byte[] audioByte;
 	
 	// temporal, delete when unnecessary

@@ -1,16 +1,12 @@
-package com.myProjects.soru_cozum.chainPattern.teacherAnswer;
+package com.myProjects.soru_cozum.chainPattern.teacher.answer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.myProjects.soru_cozum.model.AnswerImage;
-import com.myProjects.soru_cozum.response.AnswerQuestionResponse;
+import com.myProjects.soru_cozum.response.TeacherResponse;
 
 public class AnswerQuestionHandler extends TeacherAnswerAbstractHandler{
 	
-	private final static Logger LOGGER = LoggerFactory.getLogger(AnswerQuestionHandler.class);
 	
 	@Override
 	public ResponseEntity<?> handle(TeacherAnswerRequest request) {
@@ -19,7 +15,8 @@ public class AnswerQuestionHandler extends TeacherAnswerAbstractHandler{
 		request.getQuestion().addTeacherToQuestion(request.getTeacher());
 		request.getQuestion().setAnswered(true);
 		request.getQuestionService().updateQuestion(request.getQuestion());
-		
-		return new ResponseEntity<>(new AnswerQuestionResponse("SUCCESS", "Your answer was sent"), HttpStatus.OK);
+		getResponse().setStatu("Success");
+		getResponse().setInformation(new TeacherResponse("Your answer was sent"));
+		return new ResponseEntity<>(getResponse(), HttpStatus.OK);
 	}
 }

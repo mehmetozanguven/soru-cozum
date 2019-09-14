@@ -29,9 +29,16 @@ public class CreateNewStudentHandler extends StudentSignupAbstractHandler{
 			newStudent.setStudentDetails(request.getStudentDetails());
 		
 		Long studentId = request.getStudentService().registerNewStudent(newStudent);
-		if (studentId == 0 || studentId == null)
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new SignupResponse("Error", "Server Error"));
-		return ResponseEntity.status(HttpStatus.OK).body(newStudent);
+		if (studentId == 0 || studentId == null) {
+			getResponse().setStatu("Error");
+			getResponse().setInformation(new SignupResponse<Student>("Server Error"));
+			return new ResponseEntity<>(getResponse(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		getResponse().setStatu("Error");
+		SignupResponse<Student> signupResponse = new SignupResponse<Student>("New Student Created");
+		signupResponse.setNewRegister(newStudent);
+		getResponse().setInformation(signupResponse);
+		return new ResponseEntity<>(getResponse(), HttpStatus.OK);
 	}
 	
 }

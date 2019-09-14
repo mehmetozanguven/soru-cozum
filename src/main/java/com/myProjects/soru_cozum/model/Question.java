@@ -12,7 +12,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -56,6 +55,8 @@ public class Question {
 	inverseJoinColumns = @JoinColumn(name = "STUDENT_ID"))
 	private List<Student> studentList;
 	
+	@Column(name = "QUESTION_DOWNLOAD_URI", nullable = false)
+	private String questionDownloadUri;
 	
 	@JsonIgnore
 	@OneToOne(fetch = FetchType.LAZY,
@@ -185,6 +186,13 @@ public class Question {
 		this.publisher = publisher;
 	}
 
+	public String getQuestionDownloadUri() {
+		return questionDownloadUri;
+	}
+
+	public void setQuestionDownloadUri(String questionDownloadUri) {
+		this.questionDownloadUri = questionDownloadUri;
+	}
 
 	@Override
 	public String toString() {

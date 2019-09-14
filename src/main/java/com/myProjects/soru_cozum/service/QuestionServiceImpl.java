@@ -15,7 +15,6 @@ import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.QuestionImage;
 import com.myProjects.soru_cozum.model.Teacher;
 import com.myProjects.soru_cozum.repository.QuestionDAO;
-import com.myProjects.soru_cozum.request.AddQuestionRequest;
 
 /**
  * 
@@ -74,6 +73,19 @@ public class QuestionServiceImpl implements QuestionService{
 		questionImage.setImage(questionImageByte);
 		
 		newQuestion.setQuestionImage(questionImage);
+		
+		return newQuestion;
+	}
+	
+	public Question createNewQuestionWithCommonProperties_multipart(int pageNumber, int questionNumber,
+			QuestionCategory questionCategory, String questionSubCategory, String downloadUrl) {
+		
+		Question newQuestion = new Question();
+		newQuestion.setPageNumber(pageNumber);
+		newQuestion.setQuestionNumber(questionNumber);
+		newQuestion.setQuestionCategory(questionCategory);
+		newQuestion.setQuestionSubCategory(questionSubCategory);
+		newQuestion.setQuestionDownloadUri(downloadUrl);
 		
 		return newQuestion;
 	}

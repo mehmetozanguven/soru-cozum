@@ -2,6 +2,7 @@ package com.myProjects.soru_cozum.repository;
 
 import java.util.Optional;
 
+import com.myProjects.soru_cozum.model.AnswerAudio;
 import com.myProjects.soru_cozum.model.AnswerImage;
 import com.myProjects.soru_cozum.model.Teacher;
 
@@ -11,10 +12,13 @@ public interface TeacherDAO {
 
 	void registerNewTeacher(Teacher teacher);
 
-	Optional<AnswerImage> getAnswerImageFromTeacher(Long teacherId, Long questionId);
 
 	void updateTeacher(Teacher teacher);
 	
 	public Optional<Teacher> findTeacherByUsername(String username);
+	
+	Optional<AnswerImage> findAnswerImageFromTeacher(Long teacherId, Long questionId);
+
+	Optional<AnswerAudio> findAnswerAudioFromTeacher(Long teacherId, Long questionId);
 
 }

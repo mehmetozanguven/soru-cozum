@@ -8,8 +8,6 @@ import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.Student;
 import com.myProjects.soru_cozum.model.StudentDetails;
-import com.myProjects.soru_cozum.model.TeacherDetails;
-import com.myProjects.soru_cozum.request.NewRegisterRequestForStudent;
 import com.myProjects.soru_cozum.response.StudentQuestionAnswerResponse;
 
 public interface StudentService {

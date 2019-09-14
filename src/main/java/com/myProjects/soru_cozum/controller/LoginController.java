@@ -3,6 +3,7 @@ package com.myProjects.soru_cozum.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.myProjects.soru_cozum.request.LoginUserRequest;
+import com.myProjects.soru_cozum.response.GenericResponse;
 import com.myProjects.soru_cozum.response.JwtAuthenticationResponse;
 import com.myProjects.soru_cozum.security.JwtTokenProvider;
 import com.myProjects.soru_cozum.security.SecurePerson;
@@ -40,6 +42,9 @@ public class LoginController {
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		SecurePerson userPrincipal = (SecurePerson) authentication.getPrincipal();
 		String jwt = tokenProvider.generateToken(authentication, loginRequest.getLoginType());
-		return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, userPrincipal));
+		
+		GenericResponse<JwtAuthenticationResponse> response = new GenericResponse<JwtAuthenticationResponse>("Success");
+		response.setInformation(new JwtAuthenticationResponse(jwt, userPrincipal));
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 }

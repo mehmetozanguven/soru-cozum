@@ -15,11 +15,11 @@ public class FindTeacherByUsernameHandler extends TeacherSignupAbstractHandler {
 		Optional<Teacher> teacherFromDatabase = request.getTeacherService()
 				.findTeacherByUsername(request.getNewRegisterRequest().getUsername());
 		if (teacherFromDatabase.isPresent()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(new SignupResponse("Error", "This username already taken by another teacher"));
+			getResponse().setStatu("Error");
+			getResponse().setInformation(new SignupResponse<Teacher>("This username already taken by another teacher"));
+			return new ResponseEntity<>(getResponse(), HttpStatus.OK);
 		} else
 			return getNextHandler().handle(request);
-
 	}
 
 }

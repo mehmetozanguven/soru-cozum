@@ -1,6 +1,5 @@
 package com.myProjects.soru_cozum.model;
 
-import java.util.Arrays;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;

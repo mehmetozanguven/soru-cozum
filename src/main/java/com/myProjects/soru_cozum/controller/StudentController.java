@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.StudentAskQuestionAbstractHandler;
 import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.NewQuestionHandler;
 import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.PublisherExistsHandler;
-import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.StudentAskQuestionRequestHandler;
+import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.StudentAskQuestionRequest;
 import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.SomeoneAskThatQuestionHandler;
 import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.StudentAskThatQuestionHandler;
 import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.StudentExistsHandler;
@@ -29,7 +29,8 @@ import com.myProjects.soru_cozum.model.Student;
 import com.myProjects.soru_cozum.request.AddQuestionRequest;
 import com.myProjects.soru_cozum.response.AddQuestionToStudentErrorResponse;
 import com.myProjects.soru_cozum.response.StudentQuestionAnswerResponse;
-import com.myProjects.soru_cozum.service.PublisherService;
+import com.myProjects.soru_cozum.service.FileStorageService;
+import com.myProjects.soru_cozum.service.PublisherServiceImpl;
 import com.myProjects.soru_cozum.service.QuestionService;
 import com.myProjects.soru_cozum.service.StudentService;
 
@@ -49,23 +50,27 @@ public class StudentController {
 	private StudentService studentService;
 	
 	@Autowired
-	private PublisherService publisherService;
+	private PublisherServiceImpl publisherService;
 	
 	@Autowired
 	private QuestionService questionService;
 	
-	private StudentAskQuestionAbstractHandler studentCheck;
-	private StudentAskQuestionAbstractHandler publisherCheck;
-	private StudentAskQuestionAbstractHandler studentAskQuestion;
-	private StudentAskQuestionAbstractHandler someoneAskQuestion;
-	private StudentAskQuestionAbstractHandler newQuestion;
+	@Autowired
+	private FileStorageService fileStorageService;
+	
+	private StudentAskQuestionAbstractHandler studentCheckHandler;
+	private StudentAskQuestionAbstractHandler publisherCheckHandler;
+	private StudentAskQuestionAbstractHandler studentAskQuestionHandler;
+	private StudentAskQuestionAbstractHandler someoneAskQuestionHandler;
+	private StudentAskQuestionAbstractHandler newQuestionHandler;
 	
 	public StudentController() {
-		studentCheck = new StudentExistsHandler();
-		publisherCheck = new PublisherExistsHandler();
-		studentAskQuestion = new StudentAskThatQuestionHandler();
-		someoneAskQuestion = new SomeoneAskThatQuestionHandler();
-		newQuestion = new NewQuestionHandler();
+		studentCheckHandler = new StudentExistsHandler();
+		publisherCheckHandler = new PublisherExistsHandler();
+		studentAskQuestionHandler = new StudentAskThatQuestionHandler();
+		someoneAskQuestionHandler = new SomeoneAskThatQuestionHandler();
+		newQuestionHandler = new NewQuestionHandler();
+		
 	}
 	
 	@GetMapping("/{id}")
@@ -129,17 +134,19 @@ public class StudentController {
 		LOGGER.debug("Student will add new Question in his list");
 		Student student = studentService.findById((long)addQuestionToStudentRequest.getStudentId());
 		Publisher publisher = publisherService.findById((long) addQuestionToStudentRequest.getPublisher().getId());
-		StudentAskQuestionRequestHandler request = new StudentAskQuestionRequestHandler(studentService, questionService, publisherService);
+		StudentAskQuestionRequest request = new StudentAskQuestionRequest(studentService, questionService,
+				publisherService, fileStorageService);
 		request.setStudent(student);
 		request.setPublisher(publisher);
 		request.setAddQuestionToStudentRequest(addQuestionToStudentRequest);
 		
-		studentCheck.setNextHandler(publisherCheck);
-		publisherCheck.setNextHandler(studentAskQuestion);
-		studentAskQuestion.setNextHandler(someoneAskQuestion);
-		someoneAskQuestion.setNextHandler(newQuestion);
+		studentCheckHandler.setNextHandler(publisherCheckHandler);
+//		fileStorageHandler.setNextHandler(publisherCheckHandler);
+		publisherCheckHandler.setNextHandler(studentAskQuestionHandler);
+		studentAskQuestionHandler.setNextHandler(someoneAskQuestionHandler);
+		someoneAskQuestionHandler.setNextHandler(newQuestionHandler);
 		
-		return studentCheck.handle(request);	
+		return studentCheckHandler.handle(request);	
 	}
 
 	

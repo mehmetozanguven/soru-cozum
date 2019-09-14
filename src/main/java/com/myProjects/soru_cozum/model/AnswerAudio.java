@@ -21,8 +21,8 @@ public class AnswerAudio {
 	@Column(name = "ANSWER_VIDEO_ID")
 	private Long id;
 	
-	@Column(name = "IMAGE")
-	private byte[] image;
+	@Column(name = "AUDIO")
+	private byte[] audio;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "TEACHER_ID")
@@ -42,12 +42,12 @@ public class AnswerAudio {
 		this.id = id;
 	}
 
-	public byte[] getImage() {
-		return image;
+	public byte[] getAudio() {
+		return audio;
 	}
 
-	public void setImage(byte[] image) {
-		this.image = image;
+	public void setAudio(byte[] image) {
+		this.audio = image;
 	}
 
 	public Teacher getTeacher() {

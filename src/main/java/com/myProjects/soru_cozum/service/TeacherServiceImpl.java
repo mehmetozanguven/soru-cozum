@@ -1,7 +1,5 @@
 package com.myProjects.soru_cozum.service;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +27,6 @@ import com.myProjects.soru_cozum.model.json.StudentJSON;
 import com.myProjects.soru_cozum.repository.AnswerDAO;
 import com.myProjects.soru_cozum.repository.TeacherDAO;
 import com.myProjects.soru_cozum.request.AnswerQuestionRequest;
-import com.myProjects.soru_cozum.request.NewRegisterRequestForTeacher;
 
 @Service
 @Transactional
@@ -43,9 +40,8 @@ public class TeacherServiceImpl implements TeacherService{
 	private AnswerDAO answerDAO;
 	
 	@Override
-	public Teacher findTeacherById(long teacherId) {
-		Optional<Teacher> teacher = teacherDAO.findTeacherById(teacherId);
-		return teacher.orElse(new Teacher((long) 0));
+	public Optional<Teacher> findTeacherById(long teacherId) {
+		return teacherDAO.findTeacherById(teacherId);
 	}
 	
 	@Override
@@ -59,7 +55,7 @@ public class TeacherServiceImpl implements TeacherService{
 		answerImage.setAssociatedQuestionId(answerQuestionRequest.getQuestionId());
 		
 		AnswerAudio answerAudio = new AnswerAudio();
-		answerAudio.setImage(answerQuestionRequest.getAudioByte());
+		answerAudio.setAudio(answerQuestionRequest.getAudioByte());
 		answerAudio.setAssociatedQuestionId(answerQuestionRequest.getQuestionId());
 		
 		teacher.addImageToTeacher(answerImage);
@@ -101,9 +97,13 @@ public class TeacherServiceImpl implements TeacherService{
 	}
 	
 	@Override
-	public AnswerImage getAnswerImageFromTeacher(Long teacherId, Long questionId) {
-		Optional<AnswerImage> answerImage = teacherDAO.getAnswerImageFromTeacher(teacherId, questionId);
-		return answerImage.orElse(new AnswerImage((long) 0));
+	public Optional<AnswerImage> findAnswerImageFromTeacher(Long teacherId, Long questionId) {
+		return teacherDAO.findAnswerImageFromTeacher(teacherId, questionId);
+	}
+	
+	@Override
+	public Optional<AnswerAudio> findAnswerAudioFromTeacher(Long teacherId, Long questionId) {
+		return teacherDAO.findAnswerAudioFromTeacher(teacherId, questionId);
 	}
 	
 	@Override
@@ -118,6 +118,13 @@ public class TeacherServiceImpl implements TeacherService{
 		teacherDAO.updateTeacher(teacher);
 	}
 	
+	@Override
+	public void updateTeacherAnswerAudio(Teacher teacher, AnswerAudio oldAnswerAudio, AnswerAudio newAnswerAudio) {
+		teacher.updateAnswerAudio(oldAnswerAudio, newAnswerAudio);
+		answerDAO.deleteAnswerAudio(oldAnswerAudio);
+		teacherDAO.updateTeacher(teacher);
+	}
+
 	@Override
 	public Teacher createNewTeacher(String name, String password, String username, String surname) {
 		Teacher newTeacher = new Teacher();
@@ -135,6 +142,10 @@ public class TeacherServiceImpl implements TeacherService{
 		newDetails.setTeacherDepartment(department);
 		return newDetails;
 	}
+
+	
+	
+	
 	
 	/*
 	

@@ -7,7 +7,6 @@ import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.QuestionImage;
 import com.myProjects.soru_cozum.model.Teacher;
-import com.myProjects.soru_cozum.request.AddQuestionRequest;
 
 public interface QuestionService {
 	
@@ -25,6 +24,9 @@ public interface QuestionService {
 
 	Question createNewQuestionWithCommonProperties(int pageNumber, int questionNumber,
 			QuestionCategory questionCategory, String questionSubCategory, byte[] questionImageByte);
+	
+	Question createNewQuestionWithCommonProperties_multipart(int pageNumber, int questionNumber,
+			QuestionCategory questionCategory, String questionSubCategory, String downloadUrl);
 	
 	void addPublisherToQuestionn(Question question, Publisher publisher);
 
