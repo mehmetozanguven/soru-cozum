@@ -12,7 +12,7 @@ import com.myProjects.soru_cozum.response.StudentQuestionAnswerResponse;
 
 public interface StudentService {
 	
-	Student findById(Long studentId);
+	Optional<Student> findById(Long studentId);
 	
 	Student findByUsernameAndPassword(String username, String password);
 	
@@ -27,8 +27,9 @@ public interface StudentService {
 	Long registerNewStudent(Student student);
 	
 	
-	Question isStudentAskedThatQuestionBefore(Student student, Publisher publisher, int pageNumber,
-			int questionNumber);
+	Optional<Question> isStudentAskedThatQuestionBefore(Student student, Publisher publisher, int pageNumber,
+			int questionNumber, String questionCategory, String questionSubCategory);
+	
 	
 	List<StudentQuestionAnswerResponse> getQuestionList(Student student);
 	

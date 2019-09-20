@@ -34,7 +34,7 @@ public class CreateNewStudentHandler extends StudentSignupAbstractHandler{
 			getResponse().setInformation(new SignupResponse<Student>("Server Error"));
 			return new ResponseEntity<>(getResponse(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		getResponse().setStatu("Error");
+		getResponse().setStatu("Success");
 		SignupResponse<Student> signupResponse = new SignupResponse<Student>("New Student Created");
 		signupResponse.setNewRegister(newStudent);
 		getResponse().setInformation(signupResponse);

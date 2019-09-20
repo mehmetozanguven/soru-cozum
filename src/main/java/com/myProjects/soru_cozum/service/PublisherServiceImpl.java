@@ -1,5 +1,6 @@
 package com.myProjects.soru_cozum.service;
 
+import java.time.YearMonth;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -17,11 +18,11 @@ public class PublisherServiceImpl implements PublisherService{
 	private PublisherDAO publisherDAO;
 	
 
-	public Publisher findById(long publisherId) {
+	public Optional<Publisher> findById(long publisherId) {
 	
 		Optional<Publisher> publisher = publisherDAO.findById(publisherId);
 			
-		return publisher.orElse(new Publisher("nonce"));
+		return publisher;
 	}
 	
 	
@@ -37,5 +38,11 @@ public class PublisherServiceImpl implements PublisherService{
 		return newPublisher;
 	}
 	
+	public Publisher createUnknownPublisher() {
+		Publisher unknownPublisher = new Publisher();
+		unknownPublisher.setName("unknown");
+		unknownPublisher.setPublishYear(YearMonth.now().getYear());
+		return unknownPublisher;
+	}
 	
 }

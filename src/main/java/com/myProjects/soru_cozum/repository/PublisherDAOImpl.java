@@ -21,10 +21,8 @@ public class PublisherDAOImpl implements PublisherDAO {
 	public Optional<Publisher> findById(Long publisherId) {
 		Session currentSes = entityManager.unwrap(Session.class);
 		Publisher publisher = currentSes.get(Publisher.class, publisherId);
-		if (publisher == null) {
-			return Optional.of(new Publisher("nonce"));
-		}
-		return Optional.of(publisher);
+		
+		return Optional.ofNullable(publisher);
 	}
 	
 	@Override

@@ -3,36 +3,49 @@ package com.myProjects.soru_cozum.controller;
 
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.StudentAskQuestionAbstractHandler;
+import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.FileStorageHandler;
 import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.NewQuestionHandler;
 import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.PublisherExistsHandler;
 import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.StudentAskQuestionRequest;
 import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.SomeoneAskThatQuestionHandler;
 import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.StudentAskThatQuestionHandler;
 import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.StudentExistsHandler;
+import com.myProjects.soru_cozum.enums.QuestionCategory;
 import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Student;
 import com.myProjects.soru_cozum.request.AddQuestionRequest;
+import com.myProjects.soru_cozum.response.AddQuestionToStudent;
 import com.myProjects.soru_cozum.response.AddQuestionToStudentErrorResponse;
+import com.myProjects.soru_cozum.response.GenericResponse;
+import com.myProjects.soru_cozum.response.StudentAskQuestionResponse;
 import com.myProjects.soru_cozum.response.StudentQuestionAnswerResponse;
+import com.myProjects.soru_cozum.response.StudentQuestionDownloadRequest;
+import com.myProjects.soru_cozum.response.StudentQuestionUploadResponse;
 import com.myProjects.soru_cozum.service.FileStorageService;
 import com.myProjects.soru_cozum.service.PublisherServiceImpl;
 import com.myProjects.soru_cozum.service.QuestionService;
 import com.myProjects.soru_cozum.service.StudentService;
+import com.myProjects.soru_cozum.util.QuestionUrlParser;
 
 
 
@@ -58,26 +71,29 @@ public class StudentController {
 	@Autowired
 	private FileStorageService fileStorageService;
 	
-	private StudentAskQuestionAbstractHandler studentCheckHandler;
-	private StudentAskQuestionAbstractHandler publisherCheckHandler;
-	private StudentAskQuestionAbstractHandler studentAskQuestionHandler;
-	private StudentAskQuestionAbstractHandler someoneAskQuestionHandler;
+	private StudentAskQuestionAbstractHandler isStudentExistsHandler;
+	private StudentAskQuestionAbstractHandler isPublisherExistsCheckHandler;
+	private StudentAskQuestionAbstractHandler isStudentAskQuestionHandler;
+	private StudentAskQuestionAbstractHandler isSomeoneAskQuestionHandler;
 	private StudentAskQuestionAbstractHandler newQuestionHandler;
+	private StudentAskQuestionAbstractHandler fileStorageHandler;
 	
 	public StudentController() {
-		studentCheckHandler = new StudentExistsHandler();
-		publisherCheckHandler = new PublisherExistsHandler();
-		studentAskQuestionHandler = new StudentAskThatQuestionHandler();
-		someoneAskQuestionHandler = new SomeoneAskThatQuestionHandler();
+		isStudentExistsHandler = new StudentExistsHandler();
+		isPublisherExistsCheckHandler = new PublisherExistsHandler();
+		isStudentAskQuestionHandler = new StudentAskThatQuestionHandler();
+		isSomeoneAskQuestionHandler = new SomeoneAskThatQuestionHandler();
+		fileStorageHandler = new FileStorageHandler();
 		newQuestionHandler = new NewQuestionHandler();
+		
 		
 	}
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<?> findStudentById(@PathVariable(value="id") Long studentId) {
 		LOGGER.debug(String.valueOf(studentId));
-		Student student = studentService.findById(studentId);
-		if (student.getName() != "nonce")
+		Optional<Student> student = studentService.findById(studentId);
+		if (!student.isPresent())
 			return ResponseEntity.ok().body(student);
 		else
 			return ResponseEntity.notFound().build();
@@ -130,35 +146,67 @@ public class StudentController {
 	 * @return
 	 */
 	@PostMapping("/addQuestionToStudent")
-	public ResponseEntity<?> addQuestionToStudent(@Valid @RequestBody AddQuestionRequest addQuestionToStudentRequest){
-		LOGGER.debug("Student will add new Question in his list");
-		Student student = studentService.findById((long)addQuestionToStudentRequest.getStudentId());
-		Publisher publisher = publisherService.findById((long) addQuestionToStudentRequest.getPublisher().getId());
+	public ResponseEntity<?> uploadStudentQuestion(@RequestPart(value = "image") MultipartFile image,
+			   @RequestPart(value = "studentId") String studentId, 
+			   @RequestPart(value = "studentUsername") String username,
+			   @RequestPart(value = "questionPageNumber") String pageNumber,
+			   @RequestPart(value = "questionNumber") String questionNumber,
+			   @RequestPart(value = "publisherId") String publisherId,
+			   @RequestPart(value = "category") String category,
+			   @RequestPart(value = "subCategory") String subCategory){
+		LOGGER.info("Student will try to  add new Question in his list");
+		GenericResponse<StudentAskQuestionResponse> response = new GenericResponse<StudentAskQuestionResponse>();
+		
+		Long studentId_l =null;
+		Long publisherId_l = null;
+		Integer pageNum = null;
+		Integer questionNum = null;
+		QuestionCategory categoryFromValue;
+		try {
+			studentId_l = Long.parseLong(studentId);
+			publisherId_l = Long.parseLong(publisherId);
+			pageNum = Integer.parseInt(pageNumber);
+			questionNum = Integer.parseInt(questionNumber);
+			categoryFromValue = QuestionCategory.questionCategoryFromValue(category);
+			categoryFromValue.getValue(); // don't remove this line otherwise nullpointer exception couldn't be caught
+		}catch (NumberFormatException | NullPointerException e) {
+			response.setStatu("Error");
+			response.setInformation(new StudentAskQuestionResponse("Can't convert to String to Number/null pointer exception"));
+			return  new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		Optional<Student> student = studentService.findById(studentId_l);
+		Optional<Publisher> publisher = publisherService.findById(publisherId_l);
+				
 		StudentAskQuestionRequest request = new StudentAskQuestionRequest(studentService, questionService,
 				publisherService, fileStorageService);
 		request.setStudent(student);
 		request.setPublisher(publisher);
-		request.setAddQuestionToStudentRequest(addQuestionToStudentRequest);
+		request.setQuestionCategory(category);
+		request.setQuestionSubCategory(subCategory);
+		request.setPageNumber(pageNum);
+		request.setQuestionNumber(questionNum);
+		request.setQuestionMultipartFile(image);
+
+		isStudentExistsHandler.setNextHandler(isPublisherExistsCheckHandler);
+		isPublisherExistsCheckHandler.setNextHandler(isStudentAskQuestionHandler);
+		isStudentAskQuestionHandler.setNextHandler(isSomeoneAskQuestionHandler);
+		isSomeoneAskQuestionHandler.setNextHandler(fileStorageHandler);
+		fileStorageHandler.setNextHandler(newQuestionHandler);
 		
-		studentCheckHandler.setNextHandler(publisherCheckHandler);
-//		fileStorageHandler.setNextHandler(publisherCheckHandler);
-		publisherCheckHandler.setNextHandler(studentAskQuestionHandler);
-		studentAskQuestionHandler.setNextHandler(someoneAskQuestionHandler);
-		someoneAskQuestionHandler.setNextHandler(newQuestionHandler);
-		
-		return studentCheckHandler.handle(request);	
+		return isStudentExistsHandler.handle(request);	
 	}
 
 	
 	@GetMapping("/getStudentQuestionList/{id}")
 	public ResponseEntity<?> getStudentQuestionListById(@PathVariable("id") String studentId) {
 		// Check the student exists
-		Student student = studentService.findById(Long.valueOf(studentId));
+		Optional<Student> student = studentService.findById(Long.valueOf(studentId));
 
-		if (student.getName() == "nonce")
+		if (!student.isPresent())
 			return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Error", "Invalid Student ID"));
 		
-		List<StudentQuestionAnswerResponse> questionList = studentService.getQuestionList(student);
+		List<StudentQuestionAnswerResponse> questionList = studentService.getQuestionList(student.get());
 		
 		if (questionList == null || questionList.isEmpty())
 			return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Success", "You didn't ask any question"));
@@ -169,12 +217,12 @@ public class StudentController {
 	@GetMapping("/getStudentAnswerList/{id}")
 	public ResponseEntity<?> getStudentAnswerListById(@PathVariable("id") String studentId) {
 		// Check the student exists
-		Student student = studentService.findById(Long.valueOf(studentId));
+		Optional<Student> student = studentService.findById(Long.valueOf(studentId));
 
-		if (student.getName() == "nonce")
+		if (!student.isPresent())
 			return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Error", "Invalid Student ID"));
 		
-		List<StudentQuestionAnswerResponse> answerList = studentService.getAnswerList(student);
+		List<StudentQuestionAnswerResponse> answerList = studentService.getAnswerList(student.get());
 		
 		if (answerList == null || answerList.isEmpty())
 			return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Success", "No answer yet"));

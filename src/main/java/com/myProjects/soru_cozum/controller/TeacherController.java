@@ -67,7 +67,12 @@ public class TeacherController {
 		oldAnswerAudioHandler = new TeacherOldAnswerAudioHandler();
 		updateAnswerHandler = new UpdateAnswerHandler();
 	}
-
+	
+	/**
+	 * Returns all non-answered specific type questions
+	 * @param questionCategory
+	 * @return
+	 */
 	@GetMapping("/allQuestion/{categoryName}")
 	public ResponseEntity<?> getAllNonAnsweredQuestionBySpecificType(@PathVariable("categoryName") QuestionCategory questionCategory){
 		List<Question> allSpecificQuestions = questionService.getAllNonAnsweredQuestionsBySpecificType(questionCategory);
@@ -139,19 +144,7 @@ public class TeacherController {
 		oldAnswerAudioHandler.setNextHandler(updateAnswerHandler);
 		
 		return teacherExists_updateHandler.handle(request);
-		
-	/*	Teacher teacher = teacherService.findTeacherById(answerQuestionRequest.getTeacherId());
-		AnswerImage oldAnswerImage = teacherService.findAnswerImageFromTeacher(answerQuestionRequest.getTeacherId(), answerQuestionRequest.getQuestionId());
-		if (oldAnswerImage.getId() == 0)
-			return new ResponseEntity<>("Error happened", HttpStatus.INTERNAL_SERVER_ERROR);
-		
-		AnswerImage newAnswerImage = new AnswerImage();
-		newAnswerImage.setAssociatedQuestionId(answerQuestionRequest.getQuestionId());
-		newAnswerImage.setImage(answerQuestionRequest.getImageByte());
-		
-		teacherService.updateTeacherAnswerImage(teacher, oldAnswerImage, newAnswerImage);
-		
-		return new ResponseEntity<>("You changed your answer", HttpStatus.OK);*/
+	
 	}
 	
 	

@@ -1,6 +1,8 @@
 package com.myProjects.soru_cozum.model;
 
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -32,7 +34,7 @@ public class Publisher {
 	@JsonIgnore
 	@OneToMany(cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH },
 			mappedBy = "publisher" )
-	private List<Question> questionList;
+	private Set<Question> questionSet;
 	
 	public Publisher() {
 		
@@ -65,6 +67,14 @@ public class Publisher {
 	public void setPublishYear(int publishYear) {
 		this.publishYear = publishYear;
 	}
+	
+	public void addQuestion(Question question) {
+		if (questionSet == null)
+			questionSet = new TreeSet<Question>();
+		
+		questionSet.add(question);
+		question.setPublisher(this);
+	} 
 
 	@Override
 	public String toString() {

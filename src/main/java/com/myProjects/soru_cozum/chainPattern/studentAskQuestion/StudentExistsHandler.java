@@ -13,9 +13,10 @@ public class StudentExistsHandler extends StudentAskQuestionAbstractHandler {
 	@Override
 	public ResponseEntity<?> handle(StudentAskQuestionRequest request) {
 		LOGGER.debug("1. First check student exists or not");
-		if (request.getStudent().getName() == "nonce") {
+			
+		if (!request.getStudent().isPresent()) {
 			LOGGER.debug("Student not exists");
-			getResponse().setStatu("Success");
+			getResponse().setStatu("Error");
 			getResponse().setInformation(new StudentAskQuestionResponse("Invalid Student ID"));
 			return new ResponseEntity<>(getResponse(), HttpStatus.BAD_REQUEST);
 		}

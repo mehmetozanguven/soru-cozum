@@ -1,5 +1,7 @@
 package com.myProjects.soru_cozum.chainPattern.fileStorage;
 
+import com.myProjects.soru_cozum.response.StudentQuestionUploadResponse;
+
 public abstract class FileStorageAbstractHandler {
 	private FileStorageAbstractHandler nextHandler;
 
@@ -11,6 +13,6 @@ public abstract class FileStorageAbstractHandler {
 		this.nextHandler = nextHandler;
 	}
 	
-	public abstract String handle(FileStorageRequest request);
+	public abstract StudentQuestionUploadResponse handle(FileStorageRequest request);
 	
 }

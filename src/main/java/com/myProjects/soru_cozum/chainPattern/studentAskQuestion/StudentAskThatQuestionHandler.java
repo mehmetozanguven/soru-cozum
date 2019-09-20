@@ -1,5 +1,7 @@
 package com.myProjects.soru_cozum.chainPattern.studentAskQuestion;
 
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -7,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.response.StudentAskQuestionResponse;
+import com.myProjects.soru_cozum.response.StudentQuestionUploadResponse;
 
 public class StudentAskThatQuestionHandler extends StudentAskQuestionAbstractHandler{
 	private static final Logger LOGGER = LoggerFactory.getLogger(StudentAskThatQuestionHandler.class);
@@ -14,24 +17,31 @@ public class StudentAskThatQuestionHandler extends StudentAskQuestionAbstractHan
 	@Override
 	public ResponseEntity<?> handle(StudentAskQuestionRequest request) {
 		LOGGER.debug("3. Checking student ask that question before or not");
-		LOGGER.debug("\tQuestion properties:");
-		LOGGER.debug("\tStudent Id: " + request.getStudent().getId());
-		LOGGER.debug("\tPublisher Id: " + request.getPublisher().getId());
-		LOGGER.debug("\tPage number of question: " + request.getAddQuestionToStudentRequest().getPageNumber());
-		LOGGER.debug("\tQuestion number of question: " + request.getAddQuestionToStudentRequest().getQuestionNumber());
-		Question isStudentAskedThatQuestionBefore = request.getStudentService().isStudentAskedThatQuestionBefore(request.getStudent(), request.getPublisher(),
-				request.getAddQuestionToStudentRequest().getPageNumber(), request.getAddQuestionToStudentRequest().getQuestionNumber());
+		Optional<Question> isStudentAskedThatQuestionBefore = null;
+
+		isStudentAskedThatQuestionBefore = request.getStudentService().isStudentAskedThatQuestionBefore(
+				request.getStudent().get(), request.getPublisher().get(),
+				request.getPageNumber(),
+				request.getQuestionNumber(), request.getQuestionCategory(),
+				request.getQuestionSubCategory());
 		
-		if (isStudentAskedThatQuestionBefore.getId() != 0) {
+		StudentQuestionUploadResponse imageDownloadJson = prepareQuestionDownloadJson(request);
+		
+		StudentAskQuestionResponse response;
+		if (isStudentAskedThatQuestionBefore.isPresent()) {
 			getResponse().setStatu("Success");
 			LOGGER.debug("Student asked that question before, checking whether it was answered by our teacher");
-			if (isStudentAskedThatQuestionBefore.isAnswered()) {
+			if (isStudentAskedThatQuestionBefore.get().isAnswered()) {
 				LOGGER.debug("Asked question was answered by our teacher");
-				getResponse().setInformation(new StudentAskQuestionResponse("You asked that question before and it was answered by a teacher check your answer list"));
+				response = new StudentAskQuestionResponse("You asked that question before and it was answered by a teacher check your answer list");
+				response.setImageDownloadJson(imageDownloadJson);
+				getResponse().setInformation(response);
 			}
 			else {
 				LOGGER.debug("Asked question wasn't answered by our teacher");
-				getResponse().setInformation(new StudentAskQuestionResponse("You asked that question before, answer waiting"));
+				response = new StudentAskQuestionResponse("You asked that question before, answer waiting");
+				response.setImageDownloadJson(imageDownloadJson);
+				getResponse().setInformation(response);
 			}
 			return new ResponseEntity<>(getResponse(), HttpStatus.OK);
 		}else {

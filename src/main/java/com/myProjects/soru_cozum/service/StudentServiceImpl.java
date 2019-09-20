@@ -37,9 +37,9 @@ public class StudentServiceImpl implements StudentService {
 	private StudentJSONService studentJsonService;
 
 	@Override
-	public Student findById(Long studentId) {
+	public Optional<Student> findById(Long studentId) {
 		Optional<Student> student = studentDAO.findStudentById(studentId);
-		return student.orElse(new Student("nonce"));
+		return student;
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class StudentServiceImpl implements StudentService {
 		newStudent.setName(name);
 		newStudent.setPassword(password);
 		newStudent.setUsername(username);
-		newStudent.setUsername(username);
+		newStudent.setSurname(surname);
 		return newStudent;
 	}
 
@@ -87,17 +87,25 @@ public class StudentServiceImpl implements StudentService {
 	}
 
 	@Override
-	public Question isStudentAskedThatQuestionBefore(Student student, Publisher publisher, int pageNumber,
-			int questionNumber) {
+	public Optional<Question> isStudentAskedThatQuestionBefore(Student student, Publisher publisher, int pageNumber,
+			int questionNumber, String questionCategory, String questionSubCategory) {
+		Question result = null;
+		
 		for (Question eachStudentQuestion : student.getStudentQuestions()) {
 			LOGGER.debug("Student question: " + eachStudentQuestion);
 			if (eachStudentQuestion.getPageNumber() == pageNumber
 					&& eachStudentQuestion.getQuestionNumber() == questionNumber
-					&& eachStudentQuestion.getPublisher().getId() == publisher.getId()) {
-				return eachStudentQuestion;
+					&& eachStudentQuestion.getPublisher().getId() == publisher.getId()
+					&& eachStudentQuestion.getQuestionCategory().equalsIgnoreCase(questionCategory)) {
+				if (questionSubCategory != "" && questionSubCategory != null && questionSubCategory.equalsIgnoreCase(eachStudentQuestion.getQuestionSubCategory())) {
+					result = eachStudentQuestion;
+					break;
+				}
+				result = eachStudentQuestion;
+				break;
 			}
 		}
-		return new Question(0);
+		return Optional.ofNullable(result);
 	}
 
 	@Override

@@ -34,12 +34,12 @@ public class QuestionServiceImpl implements QuestionService{
 	 * else <b> return Question with id 0 which means doesn't exists </b>
 	 */
 	@Override
-	public Question findQuestionByPageNumberQuestionNumberPublisher(int pageNumber, int questionNumber,
-			Publisher publisher) {
+	public Optional<Question> findQuestionByPageNumber_QuestionNumber_Publisher(int pageNumber, int questionNumber,
+			Publisher publisher, String questionCategory, String questionSubCategory) {
 		Optional<Question> question = questionDAO.findQuestionByPageNumberQuestionNumberPublisher(pageNumber, questionNumber,
-				publisher);
+				publisher, questionCategory, questionSubCategory);
 		
-		return question.orElse(new Question(0));
+		return question;
 	}
 	
 	/**
@@ -61,7 +61,7 @@ public class QuestionServiceImpl implements QuestionService{
 	
 	@Override
 	public Question createNewQuestionWithCommonProperties(int pageNumber, int questionNumber,
-			QuestionCategory questionCategory, String questionSubCategory, byte[] questionImageByte) {
+			String questionCategory, String questionSubCategory, byte[] questionImageByte) {
 		
 		Question newQuestion = new Question();
 		newQuestion.setPageNumber(pageNumber);
@@ -78,14 +78,13 @@ public class QuestionServiceImpl implements QuestionService{
 	}
 	
 	public Question createNewQuestionWithCommonProperties_multipart(int pageNumber, int questionNumber,
-			QuestionCategory questionCategory, String questionSubCategory, String downloadUrl) {
+			String questionCategory, String questionSubCategory) {
 		
 		Question newQuestion = new Question();
 		newQuestion.setPageNumber(pageNumber);
 		newQuestion.setQuestionNumber(questionNumber);
 		newQuestion.setQuestionCategory(questionCategory);
 		newQuestion.setQuestionSubCategory(questionSubCategory);
-		newQuestion.setQuestionDownloadUri(downloadUrl);
 		
 		return newQuestion;
 	}

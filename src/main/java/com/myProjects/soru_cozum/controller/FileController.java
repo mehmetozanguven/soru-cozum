@@ -12,6 +12,7 @@ import javax.websocket.server.PathParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +28,14 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+import com.myProjects.soru_cozum.enums.QuestionCategory;
 import com.myProjects.soru_cozum.enums.StoreType;
 import com.myProjects.soru_cozum.request.QuestionDownloadRequest;
 import com.myProjects.soru_cozum.response.AddQuestionToStudent;
 import com.myProjects.soru_cozum.response.AddQuestionToStudentErrorResponse;
 import com.myProjects.soru_cozum.response.GenericResponse;
+import com.myProjects.soru_cozum.response.StudentQuestionDownloadRequest;
+import com.myProjects.soru_cozum.response.StudentQuestionUploadResponse;
 import com.myProjects.soru_cozum.service.FileStorageService;
 
 @RestController
@@ -42,72 +46,150 @@ public class FileController {
 	@Autowired
 	private FileStorageService fileStorageService;
 	
-	@PostMapping("/uploadFile/studentQuestion")
+	@Autowired
+	private Environment environment;
+	
+	@PostMapping("/uploadFile/TeacherAnswer")
+	public ResponseEntity<?> uploadTeacherAnswer(@RequestPart(value = "image") MultipartFile answerImage,
+												 @RequestPart(value = "audio") MultipartFile answerAudio,
+												 @RequestPart(value = "questionPageNumber") String pageNumber,
+												 @RequestPart(value = "questionNumber") String questionNumber,
+												 @RequestPart(value = "publisherId") String publisherId,
+												 @RequestPart(value = "category") String category,
+												 @RequestPart(value = "subCategory") String subCategory){
+		LOGGER.info(answerImage.getOriginalFilename());
+		LOGGER.info(answerAudio.getOriginalFilename());
+		return null;
+	}
+	
+	/**
+	 * Student will upload the question to the database with this method
+	 * @return download url as a response
+	 */
+	@PostMapping(value = "/uploadFile/studentQuestion", consumes = {"multipart/form-data"})
 	public ResponseEntity<?> uploadStudentQuestion(@RequestPart(value = "image") MultipartFile image,
-												   @RequestPart(value = "id") String studentId, 
-												   @RequestPart(value = "username") String username,
-												   @RequestPart(value = "pageNumber") String pageNumber,
+												   @RequestPart(value = "studentId") String studentId, 
+												   @RequestPart(value = "studentUsername") String username,
+												   @RequestPart(value = "questionPageNumber") String pageNumber,
 												   @RequestPart(value = "questionNumber") String questionNumber,
-												   @RequestPart(value = "publisherId") String publisherId) {
-		GenericResponse<AddQuestionToStudent> response = new GenericResponse<AddQuestionToStudent>();
-		int fileTypeStartIndex = image.getOriginalFilename().lastIndexOf(".") + 1;
-		String fileType = image.getOriginalFilename().substring(fileTypeStartIndex);
-		
+												   @RequestPart(value = "publisherId") String publisherId,
+												   @RequestPart(value = "category") String category,
+												   @RequestPart(value = "subCategory") String subCategory) {
+		GenericResponse<StudentQuestionUploadResponse> response = new GenericResponse<StudentQuestionUploadResponse>();
+
 		Long studentId_l =null;
-		Long pageNum = null;
 		Long publisherId_l = null;
-		Long questionNum = null;
+		Integer pageNum = null;
+		Integer questionNum = null;
+		
+		QuestionCategory categoryFromValue;
 		try {
 			studentId_l = Long.parseLong(studentId);
-			pageNum = Long.parseLong(pageNumber);
 			publisherId_l = Long.parseLong(publisherId);
-			questionNum = Long.parseLong(questionNumber);
-		}catch (NumberFormatException e) {
+			pageNum = Integer.parseInt(pageNumber);
+			questionNum = Integer.parseInt(questionNumber);
+			categoryFromValue = QuestionCategory.questionCategoryFromValue(category);
+			categoryFromValue.getValue(); // don't remove this line otherwise nullpointer exception couldn't be caught
+		}catch (NumberFormatException | NullPointerException e) {
 			response.setStatu("Error");
-			response.setInformation(new AddQuestionToStudent("Can't convert to String to Number"));
 			return  new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
-		String questionFilePath = fileStorageService.storeFile(image, 
+		LOGGER.info("Question category: " + categoryFromValue.getValue());
+		StudentQuestionUploadResponse serviceResponse = fileStorageService.storeFile(image, 
 															   StoreType.STUDENT_QUESTION, 
-															   username,  
-															   studentId_l,
 															   pageNum,
 															   questionNum,
-															   publisherId_l);
-		LOGGER.info("Question file path: " + questionFilePath);
-		if (questionFilePath.startsWith("Sorry!")) {
-			response.setStatu("Error");
-			response.setInformation(new AddQuestionToStudent("Can't store the file"));
-			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		String downloadUri = createFileDownloadUri(questionFilePath);
+															   publisherId_l,
+															   categoryFromValue,
+															   subCategory);
+		LOGGER.info("Question file path: " + serviceResponse);
+//		if (serviceResponse.getResponse().startsWith("Sorry!")) {
+//			response.setStatu("Error");
+//			response.setInformation(serviceResponse);
+//			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+//		}
+//		
 		
 		response.setStatu("Success");
-		response.setInformation(new AddQuestionToStudent(downloadUri + "." + fileType));
+		response.setInformation(serviceResponse);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	@GetMapping("/downloadFile/Questions/Student/{studentFolder}/{publisherSubFolder}/{imageFile}")
-	public ResponseEntity<?> downloadFile(@PathVariable("studentFolder") String studentFolder,
-										  @PathVariable("publisherSubFolder") String publisherSubFolder,
-										  @PathVariable("imageFile") String imageFile,
-										  HttpServletRequest request){
-		
-		File checkFileExists = Paths.get("Questions/Student/" + studentFolder + "/" + publisherSubFolder + "/" + imageFile).toFile();
-		
-		LOGGER.info("downloadFile: " + checkFileExists.toString());
-		LOGGER.info("downloadFile absolute: " + checkFileExists.getAbsolutePath());
+	
+	@PostMapping("/downloadFile/Question")
+	public ResponseEntity<?> downloadStudentQuestion(@RequestBody StudentQuestionDownloadRequest userRequest, HttpServletRequest request){
 		GenericResponse<AddQuestionToStudent> response = new GenericResponse<AddQuestionToStudent>();
+		LOGGER.info(userRequest.toString());
 		
-		if (!Files.exists(Paths.get(request.getServletContext().getRealPath(
-				"Questions/Student/" + studentFolder + "/" + publisherSubFolder + "/" + imageFile)))) {
+		// /Questions/Students
+		Path prefixPath = Paths.get(environment.getProperty("file.uploadStudentDir")).normalize();
+		Path questionRelativePath;
+		if (userRequest.getQuestionSubCategory() != ""){
+			questionRelativePath = Paths.get(userRequest.getPublisherId() + "/" 
+					+ userRequest.getQuestionCategory() + "/" + userRequest.getQuestionSubCategory() + "/" + 
+					userRequest.getPageNumber() + "/" +  userRequest.getQuestionNumber());
+		}else {
+			questionRelativePath = Paths.get(userRequest.getPublisherId() + "/" 
+					+ userRequest.getQuestionCategory() + "/" + 
+					userRequest.getPageNumber() + "/" +  userRequest.getQuestionNumber());
+		}
+		
+		File isQuestionFileExists = prefixPath.resolve(questionRelativePath).toFile();
+		if (!isQuestionFileExists.isFile()) {
 			response.setStatu("Error");
 			response.setInformation(new AddQuestionToStudent("There is no file."));
 			return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 		}
 		
-		Resource resource = fileStorageService.loadFileAsResource(checkFileExists.toString(), StoreType.STUDENT_QUESTION);
+		Resource resource = fileStorageService.loadFileAsResource(questionRelativePath.toString(), StoreType.STUDENT_QUESTION);
+		String contentType = null;
+		try {
+			contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+		} catch (IOException | NullPointerException ex) {
+			LOGGER.info("Exception: " + ex.getMessage() );
+		}
+		// Fallback to the default content type if type could not be determined
+        if(contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+	}
+	
+	/**
+	 * //localhost:8080/api/file/downloadFile/Questions/Student/1/1/Matematik/H%C3%BCcreler/13/12
+	 * Student or Teacher will download the question's image with this method.
+	 * @return
+	 */
+	@GetMapping("/downloadFile/Questions/Student/{studentFolder}/{publisherSubFolder}/{questionCategory}/{questionSubCategory}/{pageNumber}/{imageFile}")
+	public ResponseEntity<?> downloadStudentQuestion(@PathVariable("studentFolder") String studentFolder,
+										  @PathVariable("publisherSubFolder") String publisherSubFolder,
+										  @PathVariable("questionCategory") String questionCategory,
+										  @PathVariable("questionSubCategory") String questionSubCategory,
+										  @PathVariable("pageNumber") String pageNumber,
+										  @PathVariable("imageFile") String imageFile,
+										  HttpServletRequest request){
+		
+		File isFileExists = Paths.get("Questions/Student/" + studentFolder + "/" + publisherSubFolder + "/" 
+		+ questionCategory + "/" + questionSubCategory + "/" + pageNumber + "/" +  imageFile).toFile();
+		
+		LOGGER.info("downloadFile: " + isFileExists.toString());
+		LOGGER.info("downloadFile absolute file path: " + isFileExists.getAbsolutePath());
+		
+		GenericResponse<AddQuestionToStudent> response = new GenericResponse<AddQuestionToStudent>();
+		
+		if (!isFileExists.isFile()) {
+			response.setStatu("Error");
+			response.setInformation(new AddQuestionToStudent("There is no file."));
+			return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+		}
+		
+		String relativePath = isFileExists.toString();
+		LOGGER.info("Relative path is: " + relativePath);
+		Resource resource = fileStorageService.loadFileAsResource(relativePath, StoreType.STUDENT_QUESTION);
 		String contentType = null;
 		try {
 			contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
@@ -126,45 +208,12 @@ public class FileController {
 		
 	}
 	
-//	@PostMapping(value = "/downloadSingleQuestion")
-//	public ResponseEntity<?> downloadSingleStudentQuestion(@RequestBody QuestionDownloadRequest userRequest, HttpServletRequest request){
-//		String filePath = userRequest.getUserId()+"!"+userRequest.getUsername()+"/"+
-//				  userRequest.getPublisherId()+"/"+
-//				  userRequest.getPageNumber()+"!"+userRequest.getQuestionNumber();
-//		File checkFileExists = Paths.get("Questions/Student/"+filePath).toAbsolutePath().normalize().toFile();
-//		LOGGER.info("File: " + checkFileExists.getAbsolutePath());
-//		GenericResponse<AddQuestionToStudent> response = new GenericResponse<AddQuestionToStudent>();
-//		
-//		if (!checkFileExists.exists()) {
-//			response.setStatu("Error");
-//			response.setInformation(new AddQuestionToStudent("There is no file."));
-//			new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-//		}
-//		
-//		LOGGER.info("Filename is: " + filePath);
-//		
-//		Resource resource = fileStorageService.loadFileAsResource(filePath, StoreType.STUDENT_QUESTION);
-//		String contentType = null;
-//		try {
-//			contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-//		} catch (IOException ex) {
-//			LOGGER.info("Could not determine file type.");
-//		}
-//		// Fallback to the default content type if type could not be determined
-//        if(contentType == null) {
-//            contentType = "application/octet-stream";
-//        }
-//
-//        return ResponseEntity.ok()
-//                .contentType(MediaType.IMAGE_JPEG)
-//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-//                .body(resource);
-//	}
 
-	private String createFileDownloadUri(String fileName) {
+
+	private String createFileDownloadUri(String questionFilePath) {
 		String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/api/file/downloadFile/")
-                .path(fileName)
+                .path(questionFilePath)
                 .toUriString();
 		return fileDownloadUri;
 	}

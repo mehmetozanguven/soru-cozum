@@ -55,9 +55,6 @@ public class Question {
 	inverseJoinColumns = @JoinColumn(name = "STUDENT_ID"))
 	private List<Student> studentList;
 	
-	@Column(name = "QUESTION_DOWNLOAD_URI", nullable = false)
-	private String questionDownloadUri;
-	
 	@JsonIgnore
 	@OneToOne(fetch = FetchType.LAZY,
 			cascade =  { CascadeType.ALL }
@@ -170,10 +167,6 @@ public class Question {
 		return questionCategory;
 	}
 
-	public void setQuestionCategory(QuestionCategory questionCategory) {
-		this.questionCategory = questionCategory.getValue();
-	}
-
 	public String getQuestionSubCategory() {
 		return questionSubCategory;
 	}
@@ -186,13 +179,6 @@ public class Question {
 		this.publisher = publisher;
 	}
 
-	public String getQuestionDownloadUri() {
-		return questionDownloadUri;
-	}
-
-	public void setQuestionDownloadUri(String questionDownloadUri) {
-		this.questionDownloadUri = questionDownloadUri;
-	}
 
 	@Override
 	public String toString() {

@@ -11,7 +11,7 @@ import com.myProjects.soru_cozum.model.Teacher;
 public interface QuestionDAO {
 
 	Optional<Question> findQuestionByPageNumberQuestionNumberPublisher(int pageNumber, int questionNumber,
-			Publisher publisher);
+			Publisher publisher, String questionCategory, String questionSubCategory);
 
 	List<Question> getAllNonAnsweredQuestionsBySpecificType(String value);
 
