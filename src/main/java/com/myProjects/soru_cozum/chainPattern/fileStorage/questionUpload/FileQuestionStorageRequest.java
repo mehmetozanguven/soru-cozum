@@ -1,4 +1,4 @@
-package com.myProjects.soru_cozum.chainPattern.fileStorage;
+package com.myProjects.soru_cozum.chainPattern.fileStorage.questionUpload;
 
 import java.nio.file.Path;
 
@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.myProjects.soru_cozum.enums.StoreType;
 
-public class FileStorageRequest {
+public class FileQuestionStorageRequest {
 	private Path publisherSubFolder;
 	private Path questionCategoryFolder;
 	private Path questionSubCategoryFolder;
@@ -22,7 +22,7 @@ public class FileStorageRequest {
 
 	private String questionFilePath;
 
-	public FileStorageRequest(MultipartFile file, StoreType types, Integer pageNumber, Integer questionNumber,
+	public FileQuestionStorageRequest(MultipartFile file, StoreType types, Integer pageNumber, Integer questionNumber,
 			Long publisherId) {
 		this.file = file;
 		this.types = types;

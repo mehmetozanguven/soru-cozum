@@ -47,9 +47,9 @@ public class QuestionServiceImpl implements QuestionService{
 	 * If question doesn't exists, its id will be 0
 	 */
 	@Override
-	public Question findQuestionById(long questionId) {
+	public Optional<Question> findQuestionById(long questionId) {
 		Optional<Question> question = questionDAO.findQuestionById(questionId);
-		return question.orElse(new Question(0));
+		return question;
 	}
 	
 	@Override

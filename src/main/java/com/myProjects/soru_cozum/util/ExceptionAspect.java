@@ -28,4 +28,11 @@ public class ExceptionAspect {
 		LOGGER.error("Null Pointer exception was thrown");
 		LOGGER.error(ex.getLocalizedMessage());
 	}
+	
+	@AfterThrowing(pointcut = "execution(* com.myProjects.soru_cozum.controller..*.*(..))",  throwing = "ex" )
+	public void nullPointerExceptionForController(JoinPoint method, NullPointerException ex) {
+		LOGGER.info("Method's signature name: " + method.getSignature());
+		LOGGER.error("Null Pointer exception was thrown");
+		LOGGER.error(ex.getLocalizedMessage());
+	}
 }

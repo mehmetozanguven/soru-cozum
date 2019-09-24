@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
@@ -31,11 +32,13 @@ import org.springframework.http.MediaType;
 import com.myProjects.soru_cozum.enums.QuestionCategory;
 import com.myProjects.soru_cozum.enums.StoreType;
 import com.myProjects.soru_cozum.request.QuestionDownloadRequest;
+import com.myProjects.soru_cozum.request.service.TeacherAnswerAudioUploadServiceResponse;
 import com.myProjects.soru_cozum.response.AddQuestionToStudent;
 import com.myProjects.soru_cozum.response.AddQuestionToStudentErrorResponse;
 import com.myProjects.soru_cozum.response.GenericResponse;
 import com.myProjects.soru_cozum.response.StudentQuestionDownloadRequest;
 import com.myProjects.soru_cozum.response.StudentQuestionUploadResponse;
+import com.myProjects.soru_cozum.response.service.TeacherAnswerImageServiceResponse;
 import com.myProjects.soru_cozum.service.FileStorageService;
 
 @RestController
@@ -49,72 +52,41 @@ public class FileController {
 	@Autowired
 	private Environment environment;
 	
-	@PostMapping("/uploadFile/TeacherAnswer")
-	public ResponseEntity<?> uploadTeacherAnswer(@RequestPart(value = "image") MultipartFile answerImage,
-												 @RequestPart(value = "audio") MultipartFile answerAudio,
-												 @RequestPart(value = "questionPageNumber") String pageNumber,
-												 @RequestPart(value = "questionNumber") String questionNumber,
-												 @RequestPart(value = "publisherId") String publisherId,
-												 @RequestPart(value = "category") String category,
-												 @RequestPart(value = "subCategory") String subCategory){
-		LOGGER.info(answerImage.getOriginalFilename());
-		LOGGER.info(answerAudio.getOriginalFilename());
-		return null;
-	}
-	
-	/**
-	 * Student will upload the question to the database with this method
-	 * @return download url as a response
-	 */
-	@PostMapping(value = "/uploadFile/studentQuestion", consumes = {"multipart/form-data"})
-	public ResponseEntity<?> uploadStudentQuestion(@RequestPart(value = "image") MultipartFile image,
-												   @RequestPart(value = "studentId") String studentId, 
-												   @RequestPart(value = "studentUsername") String username,
-												   @RequestPart(value = "questionPageNumber") String pageNumber,
-												   @RequestPart(value = "questionNumber") String questionNumber,
-												   @RequestPart(value = "publisherId") String publisherId,
-												   @RequestPart(value = "category") String category,
-												   @RequestPart(value = "subCategory") String subCategory) {
-		GenericResponse<StudentQuestionUploadResponse> response = new GenericResponse<StudentQuestionUploadResponse>();
-
-		Long studentId_l =null;
-		Long publisherId_l = null;
-		Integer pageNum = null;
-		Integer questionNum = null;
+	@PostMapping("/downloadFile/Audio")
+	public ResponseEntity<?> downloadTeacherAudioFile(@RequestBody TeacherAnswerAudioUploadServiceResponse userRequest){
+		String filePath = fileStorageService.createAnswerAudioFilePath(userRequest);
+		Optional<Resource> resource = fileStorageService.loadFileAsResource_opt(filePath);
 		
-		QuestionCategory categoryFromValue;
-		try {
-			studentId_l = Long.parseLong(studentId);
-			publisherId_l = Long.parseLong(publisherId);
-			pageNum = Integer.parseInt(pageNumber);
-			questionNum = Integer.parseInt(questionNumber);
-			categoryFromValue = QuestionCategory.questionCategoryFromValue(category);
-			categoryFromValue.getValue(); // don't remove this line otherwise nullpointer exception couldn't be caught
-		}catch (NumberFormatException | NullPointerException e) {
+		if (!resource.isPresent()) {
+			GenericResponse<String> response = new GenericResponse<String>();
 			response.setStatu("Error");
-			return  new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			response.setInformation("There is no file");
+			return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 		}
-		LOGGER.info("Question category: " + categoryFromValue.getValue());
-		StudentQuestionUploadResponse serviceResponse = fileStorageService.storeFile(image, 
-															   StoreType.STUDENT_QUESTION, 
-															   pageNum,
-															   questionNum,
-															   publisherId_l,
-															   categoryFromValue,
-															   subCategory);
-		LOGGER.info("Question file path: " + serviceResponse);
-//		if (serviceResponse.getResponse().startsWith("Sorry!")) {
-//			response.setStatu("Error");
-//			response.setInformation(serviceResponse);
-//			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-//		}
-//		
 		
-		response.setStatu("Success");
-		response.setInformation(serviceResponse);
-		return new ResponseEntity<>(response, HttpStatus.OK);
+		return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.get().getFilename() + "\"")
+                .body(resource.get());
 	}
 	
+	@PostMapping("/downloadFile/Image")
+	public ResponseEntity<?> downloadTeacherAnswerImage(@RequestBody TeacherAnswerImageServiceResponse userRequest){
+		String filePath = fileStorageService.createAnswerImageFilePath(userRequest);
+		Optional<Resource> resource = fileStorageService.loadFileAsResource_opt(filePath);
+		
+		if (!resource.isPresent()) {
+			GenericResponse<String> response = new GenericResponse<String>();
+			response.setStatu("Error");
+			response.setInformation("There is no file");
+			return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+		}
+		
+		return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.get().getFilename() + "\"")
+                .body(resource.get());
+	}
 	
 	@PostMapping("/downloadFile/Question")
 	public ResponseEntity<?> downloadStudentQuestion(@RequestBody StudentQuestionDownloadRequest userRequest, HttpServletRequest request){

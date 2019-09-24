@@ -1,31 +1,31 @@
 package com.myProjects.soru_cozum.chainPattern.teacher.answer;
 
+import java.util.Optional;
+
+import org.springframework.web.multipart.MultipartFile;
+
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.Teacher;
 import com.myProjects.soru_cozum.request.AnswerQuestionRequest;
+import com.myProjects.soru_cozum.service.FileStorageService;
 import com.myProjects.soru_cozum.service.QuestionService;
 import com.myProjects.soru_cozum.service.TeacherService;
 
 public class TeacherAnswerRequest {
-	
+
 	private QuestionService questionService;
 	private TeacherService teacherService;
-	private Teacher teacher;
-	private Question question;
-	private AnswerQuestionRequest answerQuestionRequest;
-	
-	public TeacherAnswerRequest(QuestionService questionService, TeacherService teacherService, Teacher teacher,
-			Question question, AnswerQuestionRequest answerQuestionRequest) {
-		this.questionService = questionService;
-		this.teacherService = teacherService;
-		this.teacher = teacher;
-		this.question = question;
-		this.answerQuestionRequest = answerQuestionRequest;
-	}
+	private FileStorageService fileStorageService;
+	private Optional<Teacher> teacher;
+	private Optional<Question> question;
+	private MultipartFile imageFile;
+	private MultipartFile answerAudioFile;
 
-	public TeacherAnswerRequest(QuestionService questionService, TeacherService teacherService, Teacher teacher, Question question) {
+	public TeacherAnswerRequest(QuestionService questionService, TeacherService teacherService,
+			Optional<Teacher> teacher, Optional<Question> question, FileStorageService fileStorageService) {
 		this.questionService = questionService;
 		this.teacherService = teacherService;
+		this.fileStorageService = fileStorageService;
 		this.teacher = teacher;
 		this.question = question;
 	}
@@ -38,19 +38,40 @@ public class TeacherAnswerRequest {
 		return teacherService;
 	}
 
-	public Teacher getTeacher() {
+	public FileStorageService getFileStorageService() {
+		return fileStorageService;
+	}
+
+	public Optional<Teacher> getTeacher() {
 		return teacher;
 	}
 
-	public Question getQuestion() {
+	public void setTeacher(Optional<Teacher> teacher) {
+		this.teacher = teacher;
+	}
+
+	public Optional<Question> getQuestion() {
 		return question;
 	}
 
-	public AnswerQuestionRequest getAnswerQuestionRequest() {
-		return answerQuestionRequest;
+	public void setQuestion(Optional<Question> question) {
+		this.question = question;
 	}
-	
-	
-	
-	
+
+	public MultipartFile getImageFile() {
+		return imageFile;
+	}
+
+	public void setImageFile(MultipartFile imageFile) {
+		this.imageFile = imageFile;
+	}
+
+	public MultipartFile getAnswerAudioFile() {
+		return answerAudioFile;
+	}
+
+	public void setAnswerAudioFile(MultipartFile answerAudioFile) {
+		this.answerAudioFile = answerAudioFile;
+	}
+
 }

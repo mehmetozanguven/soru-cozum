@@ -1,4 +1,4 @@
-package com.myProjects.soru_cozum.chainPattern.fileStorage;
+package com.myProjects.soru_cozum.chainPattern.fileStorage.questionUpload;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,10 +15,10 @@ import org.springframework.util.StringUtils;
 import com.myProjects.soru_cozum.enums.StoreType;
 import com.myProjects.soru_cozum.response.StudentQuestionUploadResponse;
 
-public class FileCreatorHandler extends FileStorageAbstractHandler{
+public class FileCreatorHandler extends FileQuestionStorageAbstractHandler{
 	private Logger LOGGER = LoggerFactory.getLogger(FileCreatorHandler.class);
 	@Override
-	public StudentQuestionUploadResponse handle(FileStorageRequest request) {
+	public StudentQuestionUploadResponse handle(FileQuestionStorageRequest request) {
 		String fileName = StringUtils.cleanPath(request.getQuestionNumber().toString());
 		LOGGER.info("filename: " + fileName);
 		try {

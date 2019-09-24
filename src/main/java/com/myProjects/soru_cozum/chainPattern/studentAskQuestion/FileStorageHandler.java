@@ -21,7 +21,7 @@ public class FileStorageHandler extends StudentAskQuestionAbstractHandler{
 		int questionNumber = request.getQuestionNumber();
 		
 		StudentQuestionUploadResponse uploadRes = request.getFileStorageService()
-														.storeFile(file, type, pageNumber, questionNumber, publisherId, questionCategory, questionSubCategory);
+														.storeStudentQuestion(file, type, pageNumber, questionNumber, publisherId, questionCategory, questionSubCategory);
 		
 		request.setUploadResponse(uploadRes);
 		

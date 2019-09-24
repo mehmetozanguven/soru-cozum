@@ -11,7 +11,7 @@ import com.myProjects.soru_cozum.model.Teacher;
 
 public interface QuestionService {
 	
-	Question findQuestionById(long questionId);
+	Optional<Question> findQuestionById(long questionId);
 
 	Optional<Question> findQuestionByPageNumber_QuestionNumber_Publisher(int pageNumber, int questionNumber, Publisher publisher, String questionCategory, String questionSubCategory);
 

@@ -1,4 +1,4 @@
-package com.myProjects.soru_cozum.chainPattern.fileStorage;
+package com.myProjects.soru_cozum.chainPattern.fileStorage.questionUpload;
 
 import java.io.File;
 
@@ -7,10 +7,10 @@ import org.slf4j.LoggerFactory;
 
 import com.myProjects.soru_cozum.response.StudentQuestionUploadResponse;
 
-public class DirectoryHandler extends FileStorageAbstractHandler {
+public class DirectoryHandler extends FileQuestionStorageAbstractHandler {
 	private Logger LOGGER = LoggerFactory.getLogger(DirectoryHandler.class);
 	@Override
-	public StudentQuestionUploadResponse handle(FileStorageRequest request) {
+	public StudentQuestionUploadResponse handle(FileQuestionStorageRequest request) {
 		// Questions/Student/{studentID}
 	
 		// Questions/Student/{publisherId}

@@ -33,7 +33,14 @@ public class TeacherDAOImpl implements TeacherDAO{
 				"from Teacher t where t.id = :teacherId";
 		TypedQuery<Teacher> query = currentSess.createQuery(hibernateQuery, Teacher.class); 
 		query.setParameter("teacherId", teacherId);
-		Teacher teacher = query.getSingleResult();
+		Teacher teacher = null;
+		try {
+			teacher = query.getSingleResult();
+		}catch (NoResultException  e) {
+			LOGGER.error("There is no result for that query, which means that invalid teacher ID");
+			LOGGER.error(e.getMessage());
+		}
+		
 
 		return Optional.ofNullable(teacher);
 	}

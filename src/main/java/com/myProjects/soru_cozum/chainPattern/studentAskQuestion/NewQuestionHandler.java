@@ -26,7 +26,6 @@ public class NewQuestionHandler extends StudentAskQuestionAbstractHandler {
 		int questionNumber = request.getQuestionNumber();
 		Question newQuestion = createNewQuestion(pageNumber, questionNumber,
 												 request.getQuestionCategory(), request.getQuestionSubCategory(),
-												 false,
 												 request.getPublisher().get(),
 												 request.getQuestionService());
 		request.getPublisher().get().addQuestion(newQuestion);

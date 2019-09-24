@@ -50,13 +50,11 @@ public abstract class StudentAskQuestionAbstractHandler {
 		return imageDownloadJson;
 	}
 
-	public Question createNewQuestion(int pageNumber, int questionNumber, String questionCategory, String questionSubCategory, boolean isNewPublisher,
+	public Question createNewQuestion(int pageNumber, int questionNumber, String questionCategory, String questionSubCategory,
 			Publisher newPublisher, QuestionService questionService) {
 		
 		Question newQuestion = questionService.createNewQuestionWithCommonProperties_multipart(pageNumber, questionNumber,
 				questionCategory, questionSubCategory);
-//		if (isNewPublisher)
-//			questionService.addPublisherToQuestionn(newQuestion, newPublisher);
 		return newQuestion;
 
 	}
