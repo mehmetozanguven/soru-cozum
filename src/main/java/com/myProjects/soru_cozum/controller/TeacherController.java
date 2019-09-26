@@ -85,19 +85,6 @@ public class TeacherController {
 		return ResponseEntity.ok(allSpecificQuestions);
 	}
 	
-	@GetMapping("/getQuestionImage/{questionId}")
-	public ResponseEntity<?> getQuestionImageByQuestionId(@PathVariable("questionId") Long questionId){
-		QuestionImage questionImage = questionService.getQuestionImageByQuestionId(questionId);
-		if (questionImage.getId() == 0) {
-			GenericResponse<TeacherResponse> response = new GenericResponse<TeacherResponse>();
-			response.setStatu("Error");
-			response.setInformation(new TeacherResponse("Invalid question image id"));
-			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-		}
-		else
-			return ResponseEntity.ok().body(questionImage);
-	}
-	
 	@GetMapping("/getMyAnsweredQuestion/{teacherId}")
 	public ResponseEntity<?> getAnsweredQuestionByTeacherId(@PathVariable(value = "teacherId") Long teacherId){
 		Optional<Teacher> teacher = teacherService.findTeacherById(teacherId);
@@ -112,6 +99,37 @@ public class TeacherController {
 	}
 	
 	/**
+	 * Add audio answer to the question
+	 * @param answerAudioFile audio file
+	 * @param teacherId_str string value of teacher id
+	 * @param questionId_str string value of question id
+	 * @return
+	 */
+	@PostMapping("/answerQuestion/audio")
+	public ResponseEntity<?> addAnswerAudioToQuestion(@RequestPart(value = "answerAudio") MultipartFile answerAudioFile,
+			@RequestPart(value = "teacherId") String teacherId_str,
+			@RequestPart(value = "questionId") String questionId_str){
+		Long teacherId = null;
+		Long questionId = null;
+		try {
+			teacherId = Long.parseLong(teacherId_str);
+			questionId = Long.parseLong(questionId_str);
+		}catch (NumberFormatException e) {
+			return new ResponseEntity<>("Invalid request parameters", HttpStatus.BAD_REQUEST);
+		}
+		
+		Optional<Teacher> teacher = teacherService.findTeacherById(teacherId);
+		Optional<Question> question = questionService.findQuestionById(questionId);
+	
+		TeacherAnswerRequest request = new TeacherAnswerRequest(questionService, teacherService, teacher, question, fileStorageService);
+		request.setAnswerAudioFile(answerAudioFile);
+		
+		teacherExists.setNextHandler(questionExists);
+		questionExists.setNextHandler(answerQuestion);
+		return teacherExists.handle(request);
+	}
+	
+	/**
 	 * Answer the specific question
 	 * <ul>
 	 * 	<li> Checks the teacher id is valid, if not return error </li>
@@ -122,7 +140,7 @@ public class TeacherController {
 	 * @param answerQuestionRequest
 	 * @return
 	 */
-	@PostMapping("/answerQuestion")
+	@PostMapping("/answerQuestion/image")
 	public ResponseEntity<?> addAnswerImageToQuestion(@RequestPart(value = "answerImage") MultipartFile answerImage,
 											@RequestPart(value = "teacherId") String teacherId_str,
 											@RequestPart(value = "questionId") String questionId_str){
@@ -157,7 +175,6 @@ public class TeacherController {
 		oldAnswerAudioHandler.setNextHandler(updateAnswerHandler);
 		
 		return teacherExists_updateHandler.handle(request);
-	
 	}
 	
 	

@@ -32,12 +32,12 @@ import org.springframework.http.MediaType;
 import com.myProjects.soru_cozum.enums.QuestionCategory;
 import com.myProjects.soru_cozum.enums.StoreType;
 import com.myProjects.soru_cozum.request.QuestionDownloadRequest;
-import com.myProjects.soru_cozum.request.service.TeacherAnswerAudioUploadServiceResponse;
 import com.myProjects.soru_cozum.response.AddQuestionToStudent;
 import com.myProjects.soru_cozum.response.AddQuestionToStudentErrorResponse;
 import com.myProjects.soru_cozum.response.GenericResponse;
 import com.myProjects.soru_cozum.response.StudentQuestionDownloadRequest;
 import com.myProjects.soru_cozum.response.StudentQuestionUploadResponse;
+import com.myProjects.soru_cozum.response.service.TeacherAnswerAudioServiceResponse;
 import com.myProjects.soru_cozum.response.service.TeacherAnswerImageServiceResponse;
 import com.myProjects.soru_cozum.service.FileStorageService;
 
@@ -53,7 +53,7 @@ public class FileController {
 	private Environment environment;
 	
 	@PostMapping("/downloadFile/Audio")
-	public ResponseEntity<?> downloadTeacherAudioFile(@RequestBody TeacherAnswerAudioUploadServiceResponse userRequest){
+	public ResponseEntity<?> downloadTeacherAudioFile(@RequestBody TeacherAnswerAudioServiceResponse userRequest){
 		String filePath = fileStorageService.createAnswerAudioFilePath(userRequest);
 		Optional<Resource> resource = fileStorageService.loadFileAsResource_opt(filePath);
 		
@@ -94,7 +94,7 @@ public class FileController {
 		LOGGER.info(userRequest.toString());
 		
 		// /Questions/Students
-		Path prefixPath = Paths.get(environment.getProperty("file.uploadStudentDir")).normalize();
+		Path prefixPath = Paths.get(environment.getProperty("file.question_answer_dir")).normalize();
 		Path questionRelativePath;
 		if (userRequest.getQuestionSubCategory() != ""){
 			questionRelativePath = Paths.get(userRequest.getPublisherId() + "/" 
@@ -179,14 +179,5 @@ public class FileController {
                 .body(resource);
 		
 	}
-	
 
-
-	private String createFileDownloadUri(String questionFilePath) {
-		String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/api/file/downloadFile/")
-                .path(questionFilePath)
-                .toUriString();
-		return fileDownloadUri;
-	}
 }

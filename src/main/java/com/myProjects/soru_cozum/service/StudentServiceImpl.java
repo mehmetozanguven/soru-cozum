@@ -15,8 +15,8 @@ import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.Student;
 import com.myProjects.soru_cozum.model.StudentDetails;
+import com.myProjects.soru_cozum.model.json.StudentQuestionJSON;
 import com.myProjects.soru_cozum.repository.StudentDAO;
-import com.myProjects.soru_cozum.response.StudentQuestionAnswerResponse;
 import com.myProjects.soru_cozum.service.jsonService.StudentJSONService;
 
 /***
@@ -109,12 +109,12 @@ public class StudentServiceImpl implements StudentService {
 	}
 
 	@Override
-	public List<StudentQuestionAnswerResponse> getQuestionList(Student student) {
-		return studentJsonService.getStudentQuestions(student);
+	public List<StudentQuestionJSON> getQuestionList_new(Student student) {
+		return studentJsonService.getStudentQuestions_new(student);
 	}
 
 	@Override
-	public List<StudentQuestionAnswerResponse> getAnswerList(Student student) {
+	public List<StudentQuestionJSON> getStudentAnswerList(Student student) {
 		return studentJsonService.getStudentAnswerList(student);
 	}
 

@@ -37,8 +37,12 @@ public class FileCreatorHandler extends FileQuestionStorageAbstractHandler{
 			}
 			Files.copy(request.getFile().getInputStream(), questionFilePath, StandardCopyOption.REPLACE_EXISTING);
 			request.setQuestionFilePath(fileName);
-			Map<Integer, String> parsedQuestionFilePath = parseQuestionFilePath(questionFilePath.toString());
-			StudentQuestionUploadResponse response = prepareResponseFromParsedMap(parsedQuestionFilePath);
+			StudentQuestionUploadResponse response = new StudentQuestionUploadResponse();
+			response.setPageNumber(request.getPageNumber());
+			response.setPublisherId(request.getPublisherId());
+			response.setQuestionCategory(request.getQuestionCategory());
+			response.setQuestionNumber(request.getQuestionNumber());
+			response.setQuestionSubCategory(request.getQuestionSubCategory());
 			return response;
 			
 		} catch (IOException ex) {

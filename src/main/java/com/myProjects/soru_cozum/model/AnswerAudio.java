@@ -10,28 +10,31 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-
-
 @Entity
 @Table(name = "SS_ANSWER_VIDEO")
 public class AnswerAudio {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ANSWER_VIDEO_ID")
 	private Long id;
-	
-	@Column(name = "AUDIO")
-	private byte[] audio;
+
+	@Column(name = "PUBLISHERID")
+	private Long publisherId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "TEACHER_ID")
 	private Teacher teacher;
-	
+
 	@Column(name = "QUESTION_ID")
 	private Long associatedQuestionId;
-	
+
 	public AnswerAudio() {
+	}
+
+	public AnswerAudio(Long publisherId, Long associatedQuestionId) {
+		this.publisherId = publisherId;
+		this.associatedQuestionId = associatedQuestionId;
 	}
 
 	public Long getId() {
@@ -42,12 +45,12 @@ public class AnswerAudio {
 		this.id = id;
 	}
 
-	public byte[] getAudio() {
-		return audio;
+	public Long getPublisherId() {
+		return publisherId;
 	}
 
-	public void setAudio(byte[] image) {
-		this.audio = image;
+	public void setPublisherId(Long publisherId) {
+		this.publisherId = publisherId;
 	}
 
 	public Teacher getTeacher() {
@@ -66,7 +69,4 @@ public class AnswerAudio {
 		this.associatedQuestionId = associatedQuestionId;
 	}
 
-	
-	
-	
 }

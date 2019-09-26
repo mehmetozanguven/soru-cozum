@@ -11,27 +11,26 @@ public class DirectoryHandler extends FileQuestionStorageAbstractHandler {
 	private Logger LOGGER = LoggerFactory.getLogger(DirectoryHandler.class);
 	@Override
 	public StudentQuestionUploadResponse handle(FileQuestionStorageRequest request) {
-		// Questions/Student/{studentID}
+		// Questions
 	
-		// Questions/Student/{publisherId}
+		// Questions/{publisherId}
 		File isPublishFolderExists = new File(request.getPublisherSubFolder().toString());
 		
 		if (!isPublishFolderExists.exists())
 			isPublishFolderExists.mkdir();
 		
-		// Questions/Student/{studentID}/{publisherId}/{questionCategory}
+		// Questions/{publisherId}/{questionCategory}
 		File isQuestionCategoryFolderExists = new File(request.getQuestionCategoryFolder().toString());
 		if (!isQuestionCategoryFolderExists.exists())
 			isQuestionCategoryFolderExists.mkdir();
 		
-		if (request.getQuestionSubCategoryFolder() != null) {
-			// Questions/Student/{studentID}/{publisherId}/{questionCategory}/{subCategory}
-			File isQuestionSubCategoryFolderExists = new File(request.getQuestionSubCategoryFolder().toString());
-			if (!isQuestionSubCategoryFolderExists.exists())
-				isQuestionSubCategoryFolderExists.mkdir();
-		}
+		// Questions/{publisherId}/{questionCategory}/{subCategory}
+		File isQuestionSubCategoryFolderExists = new File(request.getQuestionSubCategoryFolder().toString());
+		if (!isQuestionSubCategoryFolderExists.exists())
+			isQuestionSubCategoryFolderExists.mkdir();
 		
-		// Questions/Student/{studentID}/{publisherId}/{questionCategory}/{subCategory}?/{pageNumber}
+		
+		// Questions/{publisherId}/{questionCategory}/{subCategory}/{pageNumber}
 		File isPageNumberFolderExists = new File(request.getPageNumberFolder().toString());
 		LOGGER.info(isPageNumberFolderExists.toString());
 		if (!isPageNumberFolderExists.exists())

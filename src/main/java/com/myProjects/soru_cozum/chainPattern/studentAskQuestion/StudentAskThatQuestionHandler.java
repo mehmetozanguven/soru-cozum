@@ -31,7 +31,7 @@ public class StudentAskThatQuestionHandler extends StudentAskQuestionAbstractHan
 		if (isStudentAskedThatQuestionBefore.isPresent()) {
 			getResponse().setStatu("Success");
 			LOGGER.debug("Student asked that question before, checking whether it was answered by our teacher");
-			if (isStudentAskedThatQuestionBefore.get().isAnswered()) {
+			if (isStudentAskedThatQuestionBefore.get().isImageAnswered()) {
 				LOGGER.debug("Asked question was answered by our teacher");
 				response = new StudentAskQuestionResponse("You asked that question before and it was answered by a teacher check your answer list");
 				response.setImageDownloadJson(imageDownloadJson);

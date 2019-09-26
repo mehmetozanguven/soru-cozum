@@ -32,8 +32,11 @@ public class Question {
 	@Column(name = "QUESTION_ID")
 	private Long id;
 
-	@Column(name = "IS_ANSWERED")
-	private boolean isAnswered;
+	@Column(name = "IS_IMAGE_ANSWERED")
+	private boolean isImageAnswered;
+	
+	@Column(name = "IS_AUDIO_ANSWERED")
+	private boolean isAudioAnswered;
 
 	@Column(name = "PAGE_NUMBER")
 	private int pageNumber;
@@ -107,12 +110,20 @@ public class Question {
 		this.id = id;
 	}
 
-	public boolean isAnswered() {
-		return isAnswered;
+	public boolean isImageAnswered() {
+		return isImageAnswered;
 	}
 
-	public void setAnswered(boolean isAnswered) {
-		this.isAnswered = isAnswered;
+	public void setImageAnswered(boolean isAnswered) {
+		this.isImageAnswered = isAnswered;
+	}
+
+	public boolean isAudioAnswered() {
+		return isAudioAnswered;
+	}
+
+	public void setAudioAnswered(boolean isAudioAnswered) {
+		this.isAudioAnswered = isAudioAnswered;
 	}
 
 	public int getPageNumber() {
@@ -182,7 +193,7 @@ public class Question {
 
 	@Override
 	public String toString() {
-		return "Question [id=" + id + ", isAnswered=" + isAnswered + ", pageNumber=" + pageNumber + ", questionNumber="
+		return "Question [id=" + id + ", isAnswered=" + isImageAnswered + ", pageNumber=" + pageNumber + ", questionNumber="
 				+ questionNumber + ", studentList=" + studentList + ", questionImage=" + questionImage
 				+ ", teacherList=" + teacherSet + ", publisher=" + publisher + "]";
 	}

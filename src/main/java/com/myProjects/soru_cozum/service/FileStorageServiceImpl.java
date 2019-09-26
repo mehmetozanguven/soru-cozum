@@ -30,11 +30,12 @@ import com.myProjects.soru_cozum.chainPattern.fileStorage.questionUpload.FileQue
 import com.myProjects.soru_cozum.chainPattern.fileStorage.questionUpload.FileQuestionStorageRequest;
 import com.myProjects.soru_cozum.enums.QuestionCategory;
 import com.myProjects.soru_cozum.enums.StoreType;
-import com.myProjects.soru_cozum.request.service.TeacherAnswerAudioUploadServiceResponse;
+import com.myProjects.soru_cozum.request.service.StudentQuestionUploadRequest;
+import com.myProjects.soru_cozum.request.service.TeacherAnswerAudioUploadServiceRequest;
 import com.myProjects.soru_cozum.request.service.TeacherAnswerImageUploadServiceRequest;
 import com.myProjects.soru_cozum.response.AnswerImageResponse;
 import com.myProjects.soru_cozum.response.StudentQuestionUploadResponse;
-import com.myProjects.soru_cozum.response.service.TeacherAnswerAudioServiceRequest;
+import com.myProjects.soru_cozum.response.service.TeacherAnswerAudioServiceResponse;
 import com.myProjects.soru_cozum.response.service.TeacherAnswerImageServiceResponse;
 
 @Service
@@ -53,7 +54,11 @@ public class FileStorageServiceImpl implements FileStorageService {
 	
 	private FileQuestionStorageAbstractHandler fileCreatorHandler;
 	private FileQuestionStorageAbstractHandler directoryHandler;
-
+	
+	/**
+	 * FileStorage Constructor will create default folders:
+	 * @param environment
+	 */
 	@Autowired
     public FileStorageServiceImpl(Environment environment) {
 		this.fileCreatorHandler = new FileCreatorHandler();
@@ -68,14 +73,14 @@ public class FileStorageServiceImpl implements FileStorageService {
 		this.DEFAULT_SUB_CATEGORY = environment.getProperty("question.defaultSubCategory");
 
 		
-		LOGGER.debug(environment.getProperty("file.uploadStudentDir"));
-        this.questionsFileStorageLocation = Paths.get(environment.getProperty("file.uploadStudentDir"))
+		LOGGER.debug(environment.getProperty("file.question_answer_dir"));
+        this.questionsFileStorageLocation = Paths.get(environment.getProperty("file.question_answer_dir"))
                 .toAbsolutePath().normalize();
-        this.questionsRelativeFileStorageLocaltion = Paths.get(environment.getProperty("file.uploadStudentDir")).normalize();
-        LOGGER.info("student file storage: " + questionsFileStorageLocation);
+        this.questionsRelativeFileStorageLocaltion = Paths.get(environment.getProperty("file.question_answer_dir")).normalize();
+        LOGGER.info("student file storage: " + questionsRelativeFileStorageLocaltion);
 
         try {
-        	Files.createDirectories(questionsFileStorageLocation);
+        	Files.createDirectories(questionsRelativeFileStorageLocaltion);
         } catch (Exception ex) {
             LOGGER.error("Can't inject file storage location for student & teacher. THIS WILL GIVE AN ERROR.");
             LOGGER.error("Error message: " + ex);
@@ -83,8 +88,8 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 	
 	@Override
-	public Optional<TeacherAnswerAudioUploadServiceResponse> storeTeacherAnswerAudio(TeacherAnswerAudioServiceRequest serviceRequest){
-		TeacherAnswerAudioUploadServiceResponse response = new TeacherAnswerAudioUploadServiceResponse();
+	public Optional<TeacherAnswerAudioServiceResponse> storeTeacherAnswerAudio(TeacherAnswerAudioUploadServiceRequest serviceRequest){
+		TeacherAnswerAudioServiceResponse response = new TeacherAnswerAudioServiceResponse();
 		
 		String questionPath_str = serviceRequest.getPublisherId() + "/" + serviceRequest.getQuestionCategory() + "/"
 				+ serviceRequest.getQuestionSubCategory() + "/" + serviceRequest.getPageNumber();
@@ -127,6 +132,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 		Path questionPath = questionsRelativeFileStorageLocaltion.resolve(questionPath_str);
 		File isQuestionDirExists = questionPath.toFile();
 		
+		// If question path doesn't exists, answer will be unnecessary
 		if (!isQuestionDirExists.exists())
 			return Optional.empty();
 		
@@ -153,6 +159,38 @@ public class FileStorageServiceImpl implements FileStorageService {
 	}
 
 	@Override
+	public Optional<StudentQuestionUploadResponse> storeStudentQuestion_new(StudentQuestionUploadRequest serviceRequest){
+		StudentQuestionUploadResponse response = new StudentQuestionUploadResponse();
+			
+		Path publishFolder = this.questionsRelativeFileStorageLocaltion.resolve(String.valueOf(serviceRequest.getPublisherId()));
+		Path questionCategoryFolder = publishFolder.resolve(serviceRequest.getQuestionCategory());
+		
+		Path questionSubCategoryFolder = null;
+		LOGGER.info(serviceRequest.getQuestionSubCategory().equalsIgnoreCase("nonce") + " ");
+		Path pageNumberFolder = questionCategoryFolder.resolve(String.valueOf(serviceRequest.getPageNumber()));
+		if (serviceRequest.getQuestionSubCategory().equalsIgnoreCase("nonce")) {
+			LOGGER.debug("Empty sub category, default will be provided");
+			questionSubCategoryFolder = questionCategoryFolder.resolve(DEFAULT_SUB_CATEGORY);
+		}else if (serviceRequest.getQuestionSubCategory().isEmpty()) {
+			questionSubCategoryFolder = questionCategoryFolder.resolve(DEFAULT_SUB_CATEGORY);
+		}else {
+			questionSubCategoryFolder = questionCategoryFolder.resolve(serviceRequest.getQuestionSubCategory());
+			pageNumberFolder = questionSubCategoryFolder.resolve(String.valueOf(serviceRequest.getPageNumber()));
+		}
+		
+		FileQuestionStorageRequest handlerRequest = FileQuestionStorageRequest.createFileStorageFromServiceRequest(serviceRequest);
+
+		handlerRequest.setPublisherSubFolder(publishFolder);
+		handlerRequest.setQuestionCategoryFolder(questionCategoryFolder);
+		handlerRequest.setQuestionSubCategoryFolder(questionSubCategoryFolder);
+		handlerRequest.setPageNumberFolder(pageNumberFolder);
+		
+		directoryHandler.setNextHandler(fileCreatorHandler);
+		response = directoryHandler.handle(handlerRequest);
+		return Optional.ofNullable(response);
+	}
+	
+	@Override
 	public StudentQuestionUploadResponse storeStudentQuestion(MultipartFile file, 
 							StoreType types, 
 							Integer pageNumber,
@@ -172,6 +210,8 @@ public class FileStorageServiceImpl implements FileStorageService {
 		Path pageNumberFolder = questionCategoryFolder.resolve(String.valueOf(pageNumber));
 		if (questionSubCategory.equalsIgnoreCase("nonce")) {
 			LOGGER.debug("Empty sub category, default will be provided");
+			questionSubCategoryFolder = questionCategoryFolder.resolve(DEFAULT_SUB_CATEGORY);
+		}else if (questionSubCategory.isEmpty()) {
 			questionSubCategoryFolder = questionCategoryFolder.resolve(DEFAULT_SUB_CATEGORY);
 		}else {
 			questionSubCategoryFolder = questionCategoryFolder.resolve(questionSubCategory);
@@ -195,7 +235,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         try {
         	Path filePath = null;
         	
-        	filePath = this.questionsFileStorageLocation.resolve(fileName).normalize();
+        	filePath = this.questionsRelativeFileStorageLocaltion.resolve(fileName).normalize();
  
             LOGGER.info("File Path after normalize: " + filePath);
             Resource resource = new UrlResource(filePath.toUri());
@@ -231,7 +271,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             return Optional.empty();
         }
     }
-	
+
 
 	@Override
 	public String createAnswerImageFilePath(TeacherAnswerImageServiceResponse userRequest) {
@@ -243,7 +283,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 	}
 
 	@Override
-	public String createAnswerAudioFilePath(TeacherAnswerAudioUploadServiceResponse userRequest) {
+	public String createAnswerAudioFilePath(TeacherAnswerAudioServiceResponse userRequest) {
 		String filePath = userRequest.getPublisherId() + "/" + userRequest.getQuestionCategory() + "/" +
 				  userRequest.getQuestionSubCategory() + "/" + userRequest.getPageNumber() + "/" +
 				  ANSWER_AUDIO_DIR + "/" + userRequest.getTeacherId() + "_" + userRequest.getQuestionId();

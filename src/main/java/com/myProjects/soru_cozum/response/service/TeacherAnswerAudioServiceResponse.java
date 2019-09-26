@@ -1,6 +1,6 @@
-package com.myProjects.soru_cozum.request.service;
+package com.myProjects.soru_cozum.response.service;
 
-public class TeacherAnswerAudioUploadServiceResponse {
+public class TeacherAnswerAudioServiceResponse {
 	private Long publisherId;
 
 	private String questionCategory;

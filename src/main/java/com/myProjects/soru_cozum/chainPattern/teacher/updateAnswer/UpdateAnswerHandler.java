@@ -14,15 +14,11 @@ public class UpdateAnswerHandler extends TeacherUpdateAnswerAbstactHandler {
 		getResponse().setStatu("Success");
 		if (request.getOldAnswerImage() != null) {
 			AnswerImage newAnswerImage = new AnswerImage();
-			newAnswerImage.setAssociatedQuestionId(request.getUserRequest().getQuestionId());
-			newAnswerImage.setImage(request.getUserRequest().getImageByte());
 			request.getTeacherService().updateTeacherAnswerImage(request.getTeacher(), request.getOldAnswerImage(),
 					newAnswerImage);
 		}
 		if (request.getOldAnswerAudio() != null) {
 			AnswerAudio newAnswerAudio = new AnswerAudio();
-			newAnswerAudio.setAssociatedQuestionId(request.getUserRequest().getQuestionId());
-			newAnswerAudio.setAudio(request.getUserRequest().getAudioByte());
 			request.getTeacherService().updateTeacherAnswerAudio(request.getTeacher(), request.getOldAnswerAudio(),
 					newAnswerAudio);
 		}

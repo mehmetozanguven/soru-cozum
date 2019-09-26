@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,19 +32,14 @@ import com.myProjects.soru_cozum.chainPattern.studentAskQuestion.StudentExistsHa
 import com.myProjects.soru_cozum.enums.QuestionCategory;
 import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Student;
-import com.myProjects.soru_cozum.request.AddQuestionRequest;
-import com.myProjects.soru_cozum.response.AddQuestionToStudent;
+import com.myProjects.soru_cozum.model.json.StudentQuestionJSON;
 import com.myProjects.soru_cozum.response.AddQuestionToStudentErrorResponse;
 import com.myProjects.soru_cozum.response.GenericResponse;
 import com.myProjects.soru_cozum.response.StudentAskQuestionResponse;
-import com.myProjects.soru_cozum.response.StudentQuestionAnswerResponse;
-import com.myProjects.soru_cozum.response.StudentQuestionDownloadRequest;
-import com.myProjects.soru_cozum.response.StudentQuestionUploadResponse;
 import com.myProjects.soru_cozum.service.FileStorageService;
 import com.myProjects.soru_cozum.service.PublisherServiceImpl;
 import com.myProjects.soru_cozum.service.QuestionService;
 import com.myProjects.soru_cozum.service.StudentService;
-import com.myProjects.soru_cozum.util.QuestionUrlParser;
 
 
 
@@ -84,9 +78,7 @@ public class StudentController {
 		isStudentAskQuestionHandler = new StudentAskThatQuestionHandler();
 		isSomeoneAskQuestionHandler = new SomeoneAskThatQuestionHandler();
 		fileStorageHandler = new FileStorageHandler();
-		newQuestionHandler = new NewQuestionHandler();
-		
-		
+		newQuestionHandler = new NewQuestionHandler();		
 	}
 	
 	@GetMapping("/{id}")
@@ -197,7 +189,6 @@ public class StudentController {
 		return isStudentExistsHandler.handle(request);	
 	}
 
-	
 	@GetMapping("/getStudentQuestionList/{id}")
 	public ResponseEntity<?> getStudentQuestionListById(@PathVariable("id") String studentId) {
 		// Check the student exists
@@ -206,12 +197,13 @@ public class StudentController {
 		if (!student.isPresent())
 			return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Error", "Invalid Student ID"));
 		
-		List<StudentQuestionAnswerResponse> questionList = studentService.getQuestionList(student.get());
+		List<StudentQuestionJSON> lists = studentService.getQuestionList_new(student.get());
 		
-		if (questionList == null || questionList.isEmpty())
+		if (lists == null || lists.isEmpty()) {
 			return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Success", "You didn't ask any question"));
+		}
 		
-		return ResponseEntity.ok().body(questionList);
+		return ResponseEntity.ok().body(lists);
 	}
 	
 	@GetMapping("/getStudentAnswerList/{id}")
@@ -222,7 +214,7 @@ public class StudentController {
 		if (!student.isPresent())
 			return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Error", "Invalid Student ID"));
 		
-		List<StudentQuestionAnswerResponse> answerList = studentService.getAnswerList(student.get());
+		List<StudentQuestionJSON> answerList = studentService.getStudentAnswerList(student.get());
 		
 		if (answerList == null || answerList.isEmpty())
 			return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Success", "No answer yet"));
