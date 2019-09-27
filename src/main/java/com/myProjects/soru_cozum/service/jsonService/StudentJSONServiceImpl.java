@@ -52,7 +52,7 @@ public class StudentJSONServiceImpl implements StudentJSONService{
 	public List<StudentQuestionJSON> getStudentAnswerList(Student student) {
 		List<StudentQuestionJSON> questionListt = new ArrayList<StudentQuestionJSON>();
 		
-		student.getStudentQuestions().forEach(eachQuestion -> {
+		student.getStudentQuestions().stream().filter(elem -> elem.isAudioAnswered() || elem.isImageAnswered()).forEach(eachQuestion -> {
 			QuestionImageJSON questionImageJSON = QuestionImageJSON.createQuestionJSON(eachQuestion,
 					eachQuestion.getPublisher());
 			List<AnswerImageJSON> answerImageJSONList = new ArrayList<AnswerImageJSON>();
