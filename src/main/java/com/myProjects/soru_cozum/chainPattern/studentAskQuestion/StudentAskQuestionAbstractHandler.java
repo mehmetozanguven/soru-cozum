@@ -58,31 +58,4 @@ public abstract class StudentAskQuestionAbstractHandler {
 		return newQuestion;
 
 	}
-	
-	public String createFileDownloadUri(String fileName) {
-		String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/downloadFile/")
-                .path(fileName)
-                .toUriString();
-		return fileDownloadUri;
-	}
-
-/*
-	private void tempConvertStringToImageByte(AddQuestionToStudentRequest addQuestionToStudentRequest) {
-		File file = new File(addQuestionToStudentRequest.getFilePath());
-		byte[] bFile = new byte[(int) file.length()];
-
-		try {
-			FileInputStream fileInputStream = new FileInputStream(file);
-			// convert file into array of bytes
-			fileInputStream.read(bFile);
-			fileInputStream.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		addQuestionToStudentRequest.setImageByte(bFile);
-
-	}
-	*/
 }

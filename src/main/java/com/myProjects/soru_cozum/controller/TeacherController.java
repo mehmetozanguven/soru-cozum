@@ -27,7 +27,6 @@ import com.myProjects.soru_cozum.chainPattern.teacher.updateAnswer.TeacherUpdate
 import com.myProjects.soru_cozum.chainPattern.teacher.updateAnswer.UpdateAnswerHandler;
 import com.myProjects.soru_cozum.enums.QuestionCategory;
 import com.myProjects.soru_cozum.model.Question;
-import com.myProjects.soru_cozum.model.QuestionImage;
 import com.myProjects.soru_cozum.model.Teacher;
 import com.myProjects.soru_cozum.model.json.AnsweredQuestionJSON;
 import com.myProjects.soru_cozum.request.AnswerQuestionRequest;
@@ -81,6 +80,7 @@ public class TeacherController {
 	 */
 	@GetMapping("/allQuestion/{categoryName}")
 	public ResponseEntity<?> getAllNonAnsweredQuestionBySpecificType(@PathVariable("categoryName") QuestionCategory questionCategory){
+		// TODO Check this is working correctly
 		List<Question> allSpecificQuestions = questionService.getAllNonAnsweredQuestionsBySpecificType(questionCategory);
 		return ResponseEntity.ok(allSpecificQuestions);
 	}

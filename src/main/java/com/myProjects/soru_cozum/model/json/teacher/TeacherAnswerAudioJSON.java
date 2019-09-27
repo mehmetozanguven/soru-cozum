@@ -82,6 +82,13 @@ public class TeacherAnswerAudioJSON {
 	public void setQuestionId(Long questionId) {
 		this.questionId = questionId;
 	}
+
+	@Override
+	public String toString() {
+		return "TeacherAnswerAudioJSON [publisherId=" + publisherId + ", questionCategory=" + questionCategory
+				+ ", questionSubCategory=" + questionSubCategory + ", pageNumber=" + pageNumber + ", questionNumber="
+				+ questionNumber + ", teacherId=" + teacherId + ", questionId=" + questionId + "]";
+	}
 	
 	
 }

@@ -26,7 +26,11 @@ public class PublisherDAOImpl implements PublisherDAO {
 	}
 	
 	@Override
-	public Publisher createNewPublisher(Publisher publisher) {
-		return null;
+	public Optional<Long> registerNewPublisher(Publisher newPublisher) {
+		Session currentSess = entityManager.unwrap(Session.class);
+		Long publisherId = (Long) currentSess.save(newPublisher);
+		if (publisherId == 0)
+			return Optional.empty();
+		return Optional.ofNullable(publisherId);
 	}
 }

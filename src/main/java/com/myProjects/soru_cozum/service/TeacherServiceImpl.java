@@ -49,8 +49,13 @@ public class TeacherServiceImpl implements TeacherService{
 		for (Question eachQuestion : teacher.getQuestionSet()) {
 			Publisher publisher = eachQuestion.getPublisher();
 			Long teacherID = teacher.getId();
-			TeacherAnswerImageJSON imageDownloadJSON = TeacherAnswerImageJSON.createTeacherAnswerAudioJSON(eachQuestion, publisher, teacherID);
-			TeacherAnswerAudioJSON audioDownloadJSON = TeacherAnswerAudioJSON.createTeacherAnswerAudioJSON(eachQuestion, publisher, teacherID);
+			
+			TeacherAnswerImageJSON imageDownloadJSON = new TeacherAnswerImageJSON();
+			TeacherAnswerAudioJSON audioDownloadJSON = new TeacherAnswerAudioJSON();
+			if (eachQuestion.isImageAnswered())
+				imageDownloadJSON = TeacherAnswerImageJSON.createTeacherAnswerAudioJSON(eachQuestion, publisher, teacherID);
+			if (eachQuestion.isAudioAnswered())
+				audioDownloadJSON = TeacherAnswerAudioJSON.createTeacherAnswerAudioJSON(eachQuestion, publisher, teacherID);
 			
 			Set<StudentJSON> setOfStudents = eachQuestion.getStudentList()
 					.stream().map(elem -> {
@@ -121,45 +126,5 @@ public class TeacherServiceImpl implements TeacherService{
 		newDetails.setTeacherDepartment(department);
 		return newDetails;
 	}
-
-	
-	
-	
-	
-	/*
-	
-	/// TEMPORAL METHODS /////
-	private void tempConvertStringToImageByte(AnswerQuestionRequest answerQuestionRequest) {
-		File file = new File(answerQuestionRequest.getImageFilePath());
-        byte[] bFile = new byte[(int) file.length()];
-        
-        try {
-	     FileInputStream fileInputStream = new FileInputStream(file);
-	     //convert file into array of bytes
-	     fileInputStream.read(bFile);
-	     fileInputStream.close();
-        } catch (Exception e) {
-	     e.printStackTrace();
-        }
-        
-        answerQuestionRequest.setImageByte(bFile);
-	}
-	
-	private void tempConvertStringToAudioByte(AnswerQuestionRequest answerQuestionRequest) {
-		File file = new File(answerQuestionRequest.getAudioFilePath());
-        byte[] bFile = new byte[(int) file.length()];
-        
-        try {
-	     FileInputStream fileInputStream = new FileInputStream(file);
-	     //convert file into array of bytes
-	     fileInputStream.read(bFile);
-	     fileInputStream.close();
-        } catch (Exception e) {
-	     e.printStackTrace();
-        }
-        
-        answerQuestionRequest.setAudioByte(bFile);
-	}
-	*/
 	
 }

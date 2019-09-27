@@ -25,6 +25,30 @@ public class AnsweredQuestionJSON {
 		this.audioJSON = audioJSON;
 		this.studentList = studentList;
 	}
+
+	public TeacherAnswerImageJSON getImageJSON() {
+		return imageJSON;
+	}
+
+	public void setImageJSON(TeacherAnswerImageJSON imageJSON) {
+		this.imageJSON = imageJSON;
+	}
+
+	public TeacherAnswerAudioJSON getAudioJSON() {
+		return audioJSON;
+	}
+
+	public void setAudioJSON(TeacherAnswerAudioJSON audioJSON) {
+		this.audioJSON = audioJSON;
+	}
+
+	public Set<StudentJSON> getStudentList() {
+		return studentList;
+	}
+
+	public void setStudentList(Set<StudentJSON> studentList) {
+		this.studentList = studentList;
+	}
 	
 	
 		

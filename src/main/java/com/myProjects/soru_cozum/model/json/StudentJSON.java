@@ -1,7 +1,11 @@
 package com.myProjects.soru_cozum.model.json;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+
 public class StudentJSON {
+	@JsonAlias("studentName")
 	private String name;
+	@JsonAlias("studentSurname")
 	private String surname;
 	
 	public StudentJSON(String name, String surname) {
@@ -24,6 +28,11 @@ public class StudentJSON {
 
 	public void setSurname(String surname) {
 		this.surname = surname;
+	}
+
+	@Override
+	public String toString() {
+		return "StudentJSON [name=" + name + ", surname=" + surname + "]";
 	}
 	
 	

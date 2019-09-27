@@ -6,7 +6,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.Teacher;
-import com.myProjects.soru_cozum.request.AnswerQuestionRequest;
 import com.myProjects.soru_cozum.service.FileStorageService;
 import com.myProjects.soru_cozum.service.QuestionService;
 import com.myProjects.soru_cozum.service.TeacherService;

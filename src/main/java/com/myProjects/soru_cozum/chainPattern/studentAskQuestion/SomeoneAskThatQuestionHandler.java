@@ -31,7 +31,6 @@ public class SomeoneAskThatQuestionHandler extends StudentAskQuestionAbstractHan
 		if (isQuestionAskedBySomeone.isPresent()) {
 			LOGGER.debug("Another student ask that question, then add only question to student list");
 			LOGGER.debug("Adding Question to the Student");
-			request.getStudentService().addQuestionToStudent(request.getStudent().get(), isQuestionAskedBySomeone.get());
 			LOGGER.debug("Update student without adding new Question !!!!");
 			request.getStudentService().addQuestionToStudentWithoutCreatingNewQuestion(isQuestionAskedBySomeone.get(), request.getStudent().get());
 			
@@ -42,7 +41,6 @@ public class SomeoneAskThatQuestionHandler extends StudentAskQuestionAbstractHan
 		}else {
 			LOGGER.debug("No one asked that question before, then go to next cycle -File Storage Handler-");
 			return getNextHandler().handle(request);
-		}
-			
+		}			
 	}
 }
