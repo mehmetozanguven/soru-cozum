@@ -12,7 +12,7 @@ import com.myProjects.soru_cozum.model.json.StudentQuestionJSON;
 
 public interface StudentService {
 
-	Optional<Student> findById(Long studentId);
+	Optional<Student> findStudentById(Long studentId);
 
 	Student findByUsernameAndPassword(String username, String password);
 

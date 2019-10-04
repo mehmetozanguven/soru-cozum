@@ -37,7 +37,7 @@ public class StudentServiceImpl implements StudentService {
 	private StudentJSONService studentJsonService;
 
 	@Override
-	public Optional<Student> findById(Long studentId) {
+	public Optional<Student> findStudentById(Long studentId) {
 		Optional<Student> student = studentDAO.findStudentById(studentId);
 		return student;
 	}

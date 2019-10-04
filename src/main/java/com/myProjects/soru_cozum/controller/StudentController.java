@@ -79,7 +79,7 @@ public class StudentController {
 	@GetMapping("/{id}")
 	public ResponseEntity<?> findStudentById(@PathVariable(value="id") Long studentId) {
 		LOGGER.debug(String.valueOf(studentId));
-		Optional<Student> student = studentService.findById(studentId);
+		Optional<Student> student = studentService.findStudentById(studentId);
 		if (!student.isPresent())
 			return ResponseEntity.ok().body(student);
 		else
@@ -162,7 +162,7 @@ public class StudentController {
 			return  new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
-		Optional<Student> student = studentService.findById(studentId_l);
+		Optional<Student> student = studentService.findStudentById(studentId_l);
 		Optional<Publisher> publisher = publisherService.findById(publisherId_l);
 				
 		StudentAskQuestionRequest request = new StudentAskQuestionRequest(studentService, questionService,
@@ -187,7 +187,7 @@ public class StudentController {
 	@GetMapping("/getStudentQuestionList/{id}")
 	public ResponseEntity<?> getStudentQuestionListById(@PathVariable("id") String studentId) {
 		// Check the student exists
-		Optional<Student> student = studentService.findById(Long.valueOf(studentId));
+		Optional<Student> student = studentService.findStudentById(Long.valueOf(studentId));
 
 		if (!student.isPresent())
 			return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Error", "Invalid Student ID"));
@@ -204,7 +204,7 @@ public class StudentController {
 	@GetMapping("/getStudentAnswerList/{id}")
 	public ResponseEntity<?> getStudentAnswerListById(@PathVariable("id") String studentId) {
 		// Check the student exists
-		Optional<Student> student = studentService.findById(Long.valueOf(studentId));
+		Optional<Student> student = studentService.findStudentById(Long.valueOf(studentId));
 
 		if (!student.isPresent())
 			return ResponseEntity.ok().body(new AddQuestionToStudentErrorResponse("Error", "Invalid Student ID"));
