@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 @Entity
 @Table(name = "SS_TEACHERS")
-public class Teacher {
+public class Teacher implements Comparable<Teacher> {
 	private final static Logger LOGGER = LoggerFactory.getLogger(Teacher.class);
 
 	@Id
@@ -59,6 +59,16 @@ public class Teacher {
 
 	public Teacher() {
 
+	}
+	
+	@Override
+	public int compareTo(Teacher o) {
+		if (this.id > o.id)
+			return 1;
+		else if (this.id < o.id)
+			return -1;
+		else
+			return 0;
 	}
 
 	public Teacher(Long id) {
