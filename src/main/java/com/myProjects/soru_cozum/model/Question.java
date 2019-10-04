@@ -25,7 +25,7 @@ import com.myProjects.soru_cozum.enums.QuestionCategory;
 @Entity
 @Table(name = "SS_QUESTIONS")
 
-public class Question {
+public class Question implements Comparable<Question>{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -87,6 +87,16 @@ public class Question {
 		
 	}
 	
+	@Override
+	public int compareTo(Question o) {
+		if (this.id > o.id)
+			return 1;
+		else if (this.id < o.id)
+			return -1;
+		else
+			return 0;
+	}
+
 	public Question(long id) {
 		this.id = id;
 	}
