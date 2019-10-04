@@ -21,16 +21,13 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.Student;
 import com.myProjects.soru_cozum.repository.StudentDAO;
 import com.myProjects.soru_cozum.repository.StudentDAOImpl;
 import com.myProjects.soru_cozum.service.StudentService;
 import com.myProjects.soru_cozum.service.StudentServiceImpl;
 
-//@RunWith(SpringRunner.class)
-////@DataJpaTest
-//@AutoConfigureTestDatabase(replace = Replace.NONE)
-//@SpringBootTest(classes = StudentDAOImpl.class)
 public class StudentServiceTests {
 	
 	@InjectMocks
@@ -38,6 +35,7 @@ public class StudentServiceTests {
 	
 	@Mock
 	private StudentDAO studentDAO;
+	
 	
 	@Before
 	public void init() {
@@ -55,24 +53,37 @@ public class StudentServiceTests {
 		assertEquals(1, found);
 	}
 	
-//	@InjectMocks
-//	private 
-//	
-//	@Autowired
-//	private TestEntityManager entityManager;
-//	
-//	@Autowired
-//	private StudentDAOImpl studentDAO;
-//	
-//	@Test
-//	public void whenFindByUsername_thenReturnEmployee() {
-//		Student ozan = new Student();
-//		ozan.setUsername("ozan");
-//		entityManager.persist(ozan);
-//		entityManager.flush();
-//		
-//		Optional<Student> found = studentDAO.findByUsername("ozan");
-//		assertEquals(found.get().getUsername(), "ozan");
-//	}
-
+	@Test
+	public void studentFindByUsername_test() {
+		Student s1 = new Student();
+		s1.setUsername("ozan");
+		
+		when(studentDAO.findByUsername("ozan")).thenReturn(Optional.of(s1));
+		String foundUsername = studentService.findByUsername("ozan").get().getUsername();
+		
+		assertEquals("ozan", foundUsername);
+	}
+	
+	@Test
+	public void registerNewStudent_test() {
+		Student newStudent = new Student();
+		newStudent.setId((long)2);
+		
+		when(studentDAO.registerNewStudent(newStudent)).thenReturn((long)newStudent.getId());
+		long foundId = studentService.registerNewStudent(newStudent);
+		assertEquals(2, foundId);
+	}
+	
+	@Test
+	public void addQuestionToStudent_test() {
+		Student student = new Student();
+		student.setId((long) 1);
+		Question question = new Question();
+		question.setId((long)1);
+		
+		studentService.addQuestionToStudent(student, question);
+		
+		assertEquals((int)1, student.getStudentQuestions().size());
+	}
+	
 }
