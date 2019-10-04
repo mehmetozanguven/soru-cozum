@@ -9,8 +9,8 @@ public class TeacherExistsHandler extends TeacherAnswerAbstractHandler{
 
 	@Override
 	public ResponseEntity<?> handle(TeacherAnswerRequest request) {
-		if (request.getTeacher().getId() == 0) {
-			getResponse().setStatu("Success");
+		if (!request.getTeacher().isPresent()) {
+			getResponse().setStatu("Error");
 			getResponse().setInformation(new TeacherResponse("Invalid teacher id"));
 			return new ResponseEntity<>(getResponse(), HttpStatus.NOT_FOUND);
 		}

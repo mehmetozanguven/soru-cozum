@@ -21,14 +21,16 @@ public class PublisherDAOImpl implements PublisherDAO {
 	public Optional<Publisher> findById(Long publisherId) {
 		Session currentSes = entityManager.unwrap(Session.class);
 		Publisher publisher = currentSes.get(Publisher.class, publisherId);
-		if (publisher == null) {
-			return Optional.of(new Publisher("nonce"));
-		}
-		return Optional.of(publisher);
+		
+		return Optional.ofNullable(publisher);
 	}
 	
 	@Override
-	public Publisher createNewPublisher(Publisher publisher) {
-		return null;
+	public Optional<Long> registerNewPublisher(Publisher newPublisher) {
+		Session currentSess = entityManager.unwrap(Session.class);
+		Long publisherId = (Long) currentSess.save(newPublisher);
+		if (publisherId == 0)
+			return Optional.empty();
+		return Optional.ofNullable(publisherId);
 	}
 }

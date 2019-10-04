@@ -16,9 +16,6 @@ public interface TeacherService {
 
 	Optional<Teacher> findTeacherById(long teacherId);
 
-	void resolveTeacherAccordingToAnswerQuestion(Teacher teacher, Question question,
-			AnswerQuestionRequest answerQuestionRequest);
-
 	List<AnsweredQuestionJSON> getAnsweredQuestionByTeacherId(Teacher teacher);
 
 	Optional<Teacher> findTeacherByUsername(String username);

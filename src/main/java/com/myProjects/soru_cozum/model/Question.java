@@ -32,8 +32,11 @@ public class Question {
 	@Column(name = "QUESTION_ID")
 	private Long id;
 
-	@Column(name = "IS_ANSWERED")
-	private boolean isAnswered;
+	@Column(name = "IS_IMAGE_ANSWERED")
+	private boolean isImageAnswered;
+	
+	@Column(name = "IS_AUDIO_ANSWERED")
+	private boolean isAudioAnswered;
 
 	@Column(name = "PAGE_NUMBER")
 	private int pageNumber;
@@ -54,9 +57,6 @@ public class Question {
 	joinColumns = @JoinColumn(name = "QUESTION_ID"), 
 	inverseJoinColumns = @JoinColumn(name = "STUDENT_ID"))
 	private List<Student> studentList;
-	
-	@Column(name = "QUESTION_DOWNLOAD_URI", nullable = false)
-	private String questionDownloadUri;
 	
 	@JsonIgnore
 	@OneToOne(fetch = FetchType.LAZY,
@@ -110,12 +110,20 @@ public class Question {
 		this.id = id;
 	}
 
-	public boolean isAnswered() {
-		return isAnswered;
+	public boolean isImageAnswered() {
+		return isImageAnswered;
 	}
 
-	public void setAnswered(boolean isAnswered) {
-		this.isAnswered = isAnswered;
+	public void setImageAnswered(boolean isAnswered) {
+		this.isImageAnswered = isAnswered;
+	}
+
+	public boolean isAudioAnswered() {
+		return isAudioAnswered;
+	}
+
+	public void setAudioAnswered(boolean isAudioAnswered) {
+		this.isAudioAnswered = isAudioAnswered;
 	}
 
 	public int getPageNumber() {
@@ -170,10 +178,6 @@ public class Question {
 		return questionCategory;
 	}
 
-	public void setQuestionCategory(QuestionCategory questionCategory) {
-		this.questionCategory = questionCategory.getValue();
-	}
-
 	public String getQuestionSubCategory() {
 		return questionSubCategory;
 	}
@@ -186,17 +190,10 @@ public class Question {
 		this.publisher = publisher;
 	}
 
-	public String getQuestionDownloadUri() {
-		return questionDownloadUri;
-	}
-
-	public void setQuestionDownloadUri(String questionDownloadUri) {
-		this.questionDownloadUri = questionDownloadUri;
-	}
 
 	@Override
 	public String toString() {
-		return "Question [id=" + id + ", isAnswered=" + isAnswered + ", pageNumber=" + pageNumber + ", questionNumber="
+		return "Question [id=" + id + ", isAnswered=" + isImageAnswered + ", pageNumber=" + pageNumber + ", questionNumber="
 				+ questionNumber + ", studentList=" + studentList + ", questionImage=" + questionImage
 				+ ", teacherList=" + teacherSet + ", publisher=" + publisher + "]";
 	}

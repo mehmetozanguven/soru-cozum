@@ -9,8 +9,8 @@ public class QuestionExistsHandler extends TeacherAnswerAbstractHandler{
 	
 	@Override
 	public ResponseEntity<?> handle(TeacherAnswerRequest request) {
-		if (request.getQuestion().getId() == 0) {
-			getResponse().setStatu("Success");
+		if (!request.getQuestion().isPresent()) {
+			getResponse().setStatu("Error");
 			getResponse().setInformation(new TeacherResponse("Invalid question id"));
 			return new ResponseEntity<>(getResponse(), HttpStatus.NOT_FOUND);
 		}

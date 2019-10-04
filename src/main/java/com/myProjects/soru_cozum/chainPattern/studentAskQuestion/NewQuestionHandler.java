@@ -15,17 +15,30 @@ public class NewQuestionHandler extends StudentAskQuestionAbstractHandler {
 	
 	@Override
 	public ResponseEntity<?> handle(StudentAskQuestionRequest request) {
-		LOGGER.debug("5. This is definitely new question");
+		LOGGER.debug("5. This is definitely new question with existing publisher");
 		LOGGER.debug("Creating new question");
-		Question newQuestion = createNewQuestion(request.getAddQuestionToStudentRequest().getQuestionUrl(), request.getAddQuestionToStudentRequest(), true,
-				request.getPublisher(), request.getQuestionService());
-		LOGGER.debug("Adding Question to the Student");
-		request.getStudentService().addQuestionToStudent(request.getStudent(), newQuestion);
-		LOGGER.debug("Update the student with adding new question into the database");
-		request.getStudentService().updateStudent(request.getStudent());
 		
+		if (request.getUploadResponse() == null) {
+			getResponse().setStatu("Failed. Couldn't upload the file");
+		}
+		
+		int pageNumber = request.getPageNumber();
+		int questionNumber = request.getQuestionNumber();
+		Question newQuestion = createNewQuestion(pageNumber, questionNumber,
+												 request.getQuestionCategory(), request.getQuestionSubCategory(),
+												 request.getPublisher().get(),
+												 request.getQuestionService());
+		request.getPublisher().get().addQuestion(newQuestion);
+		
+		LOGGER.debug("Adding Question to the Student");
+		request.getStudentService().addQuestionToStudent(request.getStudent().get(), newQuestion);
+		LOGGER.debug("Update the student with adding new question into the database");
+		request.getStudentService().updateStudent(request.getStudent().get());
+		
+		StudentAskQuestionResponse response = new StudentAskQuestionResponse("QuestionAdded");
+		response.setImageDownloadJson(request.getUploadResponse());
 		getResponse().setStatu("Success");
-		getResponse().setInformation(new StudentAskQuestionResponse("QuestionAdded"));
+		getResponse().setInformation(response);
 		return new ResponseEntity<>(getResponse(), HttpStatus.OK);
 	}
 	

@@ -1,5 +1,6 @@
 package com.myProjects.soru_cozum.service;
 
+import java.time.YearMonth;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -16,20 +17,24 @@ public class PublisherServiceImpl implements PublisherService{
 	@Autowired
 	private PublisherDAO publisherDAO;
 	
-
-	public Publisher findById(long publisherId) {
-	
-		Optional<Publisher> publisher = publisherDAO.findById(publisherId);
-			
-		return publisher.orElse(new Publisher("nonce"));
+	@Override
+	public Optional<Publisher> findById(long publisherId) {
+		Optional<Publisher> publisher = publisherDAO.findById(publisherId);			
+		return publisher;
 	}
 	
+	@Override
+	public Optional<Long> registerNewPublisher(Publisher newPublisher){
+		return publisherDAO.registerNewPublisher(newPublisher);
+	}
 	
+	@Override
 	public void createNewPublisher(Publisher publisher, Publisher newPublisher) {
 		publisher.setName(newPublisher.getName());
 		publisher.setPublishYear(newPublisher.getPublishYear());
 	}
 	
+	@Override
 	public Publisher createNewPublisherFromRequest(Publisher requestPublisher) {
 		Publisher newPublisher = new Publisher();
 		newPublisher.setName(requestPublisher.getName());
@@ -37,5 +42,12 @@ public class PublisherServiceImpl implements PublisherService{
 		return newPublisher;
 	}
 	
+	@Override
+	public Publisher createUnknownPublisher() {
+		Publisher unknownPublisher = new Publisher();
+		unknownPublisher.setName("unknown");
+		unknownPublisher.setPublishYear(YearMonth.now().getYear());
+		return unknownPublisher;
+	}
 	
 }

@@ -4,8 +4,6 @@ public class GenericResponse<T> {
 	private String statu;
 	private T information;
 	
-	
-	
 	public GenericResponse() {
 	}
 	public GenericResponse(String statu) {

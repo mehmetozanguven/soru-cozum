@@ -12,6 +12,7 @@ import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.request.AddQuestionRequest;
 import com.myProjects.soru_cozum.response.GenericResponse;
 import com.myProjects.soru_cozum.response.StudentAskQuestionResponse;
+import com.myProjects.soru_cozum.response.StudentQuestionUploadResponse;
 import com.myProjects.soru_cozum.service.QuestionService;
 
 public abstract class StudentAskQuestionAbstractHandler {
@@ -35,56 +36,26 @@ public abstract class StudentAskQuestionAbstractHandler {
 	
 	public StudentAskQuestionAbstractHandler getNextHandler() {
 		return this.nextHandler;
-	}
-	
-	
+	}	
 	
 	public GenericResponse<StudentAskQuestionResponse> getResponse() {
 		return response;
 	}
+	
+	public StudentQuestionUploadResponse prepareQuestionDownloadJson(StudentAskQuestionRequest request) {
+		Long publisherId = request.getPublisher().get().getId();
+		StudentQuestionUploadResponse imageDownloadJson = new StudentQuestionUploadResponse(publisherId, request.getQuestionCategory(),
+				request.getQuestionSubCategory(), request.getPageNumber(),
+				request.getQuestionNumber());
+		return imageDownloadJson;
+	}
 
-	public Question createNewQuestion(String filePath, AddQuestionRequest addQuestionToStudentRequest, boolean isNewPublisher,
+	public Question createNewQuestion(int pageNumber, int questionNumber, String questionCategory, String questionSubCategory,
 			Publisher newPublisher, QuestionService questionService) {
-		int pageNumber = addQuestionToStudentRequest.getPageNumber();
-		int questionNumber = addQuestionToStudentRequest.getQuestionNumber();
-		QuestionCategory questionCategory = addQuestionToStudentRequest.getQuestionCategory();
-		String questionSubCategory = addQuestionToStudentRequest.getQuestionSubCategory();
 		
-		String fileDownloadUri = createFileDownloadUri(filePath);
-		LOGGER.debug("File Downloand uri: " + fileDownloadUri);
-
 		Question newQuestion = questionService.createNewQuestionWithCommonProperties_multipart(pageNumber, questionNumber,
-				questionCategory, questionSubCategory, fileDownloadUri);
-		if (isNewPublisher)
-			questionService.addPublisherToQuestionn(newQuestion, newPublisher);
+				questionCategory, questionSubCategory);
 		return newQuestion;
 
 	}
-	
-	public String createFileDownloadUri(String fileName) {
-		String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/downloadFile/")
-                .path(fileName)
-                .toUriString();
-		return fileDownloadUri;
-	}
-
-/*
-	private void tempConvertStringToImageByte(AddQuestionToStudentRequest addQuestionToStudentRequest) {
-		File file = new File(addQuestionToStudentRequest.getFilePath());
-		byte[] bFile = new byte[(int) file.length()];
-
-		try {
-			FileInputStream fileInputStream = new FileInputStream(file);
-			// convert file into array of bytes
-			fileInputStream.read(bFile);
-			fileInputStream.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		addQuestionToStudentRequest.setImageByte(bFile);
-
-	}
-	*/
 }

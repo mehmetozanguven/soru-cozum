@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.myProjects.soru_cozum.chainPattern.teacher.answer.AnswerQuestionHandler;
 import com.myProjects.soru_cozum.chainPattern.teacher.answer.QuestionExistsHandler;
@@ -25,12 +27,12 @@ import com.myProjects.soru_cozum.chainPattern.teacher.updateAnswer.TeacherUpdate
 import com.myProjects.soru_cozum.chainPattern.teacher.updateAnswer.UpdateAnswerHandler;
 import com.myProjects.soru_cozum.enums.QuestionCategory;
 import com.myProjects.soru_cozum.model.Question;
-import com.myProjects.soru_cozum.model.QuestionImage;
 import com.myProjects.soru_cozum.model.Teacher;
 import com.myProjects.soru_cozum.model.json.AnsweredQuestionJSON;
 import com.myProjects.soru_cozum.request.AnswerQuestionRequest;
 import com.myProjects.soru_cozum.response.GenericResponse;
 import com.myProjects.soru_cozum.response.TeacherResponse;
+import com.myProjects.soru_cozum.service.FileStorageService;
 import com.myProjects.soru_cozum.service.QuestionService;
 import com.myProjects.soru_cozum.service.TeacherService;
 
@@ -47,6 +49,9 @@ public class TeacherController {
 	
 	@Autowired
 	private TeacherService teacherService;
+	
+	@Autowired
+	private FileStorageService fileStorageService;
 	
 	private TeacherAnswerAbstractHandler teacherExists;
 	private TeacherAnswerAbstractHandler questionExists;
@@ -67,24 +72,17 @@ public class TeacherController {
 		oldAnswerAudioHandler = new TeacherOldAnswerAudioHandler();
 		updateAnswerHandler = new UpdateAnswerHandler();
 	}
-
+	
+	/**
+	 * Returns all non-answered specific type questions
+	 * @param questionCategory
+	 * @return
+	 */
 	@GetMapping("/allQuestion/{categoryName}")
 	public ResponseEntity<?> getAllNonAnsweredQuestionBySpecificType(@PathVariable("categoryName") QuestionCategory questionCategory){
+		// TODO Check this is working correctly
 		List<Question> allSpecificQuestions = questionService.getAllNonAnsweredQuestionsBySpecificType(questionCategory);
 		return ResponseEntity.ok(allSpecificQuestions);
-	}
-	
-	@GetMapping("/getQuestionImage/{questionId}")
-	public ResponseEntity<?> getQuestionImageByQuestionId(@PathVariable("questionId") Long questionId){
-		QuestionImage questionImage = questionService.getQuestionImageByQuestionId(questionId);
-		if (questionImage.getId() == 0) {
-			GenericResponse<TeacherResponse> response = new GenericResponse<TeacherResponse>();
-			response.setStatu("Error");
-			response.setInformation(new TeacherResponse("Invalid question image id"));
-			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-		}
-		else
-			return ResponseEntity.ok().body(questionImage);
 	}
 	
 	@GetMapping("/getMyAnsweredQuestion/{teacherId}")
@@ -101,6 +99,37 @@ public class TeacherController {
 	}
 	
 	/**
+	 * Add audio answer to the question
+	 * @param answerAudioFile audio file
+	 * @param teacherId_str string value of teacher id
+	 * @param questionId_str string value of question id
+	 * @return
+	 */
+	@PostMapping("/answerQuestion/audio")
+	public ResponseEntity<?> addAnswerAudioToQuestion(@RequestPart(value = "answerAudio") MultipartFile answerAudioFile,
+			@RequestPart(value = "teacherId") String teacherId_str,
+			@RequestPart(value = "questionId") String questionId_str){
+		Long teacherId = null;
+		Long questionId = null;
+		try {
+			teacherId = Long.parseLong(teacherId_str);
+			questionId = Long.parseLong(questionId_str);
+		}catch (NumberFormatException e) {
+			return new ResponseEntity<>("Invalid request parameters", HttpStatus.BAD_REQUEST);
+		}
+		
+		Optional<Teacher> teacher = teacherService.findTeacherById(teacherId);
+		Optional<Question> question = questionService.findQuestionById(questionId);
+	
+		TeacherAnswerRequest request = new TeacherAnswerRequest(questionService, teacherService, teacher, question, fileStorageService);
+		request.setAnswerAudioFile(answerAudioFile);
+		
+		teacherExists.setNextHandler(questionExists);
+		questionExists.setNextHandler(answerQuestion);
+		return teacherExists.handle(request);
+	}
+	
+	/**
 	 * Answer the specific question
 	 * <ul>
 	 * 	<li> Checks the teacher id is valid, if not return error </li>
@@ -111,19 +140,26 @@ public class TeacherController {
 	 * @param answerQuestionRequest
 	 * @return
 	 */
-	@PostMapping("/answerQuestion")
-	public ResponseEntity<?> answerQuestion(@RequestBody AnswerQuestionRequest answerQuestionRequest){
-		Optional<Teacher> teacher = teacherService.findTeacherById(answerQuestionRequest.getTeacherId());
-		if (!teacher.isPresent()) {
-			GenericResponse<TeacherResponse> response = new GenericResponse<TeacherResponse>();
-			response.setStatu("Error");
-			response.setInformation(new TeacherResponse("Invalid Teacher id"));
-			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+	@PostMapping("/answerQuestion/image")
+	public ResponseEntity<?> addAnswerImageToQuestion(@RequestPart(value = "answerImage") MultipartFile answerImage,
+											@RequestPart(value = "teacherId") String teacherId_str,
+											@RequestPart(value = "questionId") String questionId_str){
+		
+		Long teacherId = null;
+		Long questionId = null;
+		
+		try {
+			teacherId = Long.parseLong(teacherId_str);
+			questionId = Long.parseLong(questionId_str);
+		}catch (NumberFormatException e) {
+			return new ResponseEntity<>("Invalid request parameters", HttpStatus.BAD_REQUEST);
 		}
 		
-		Question question = questionService.findQuestionById(answerQuestionRequest.getQuestionId());
-		
-		TeacherAnswerRequest request = new TeacherAnswerRequest(questionService, teacherService, teacher.get(), question, answerQuestionRequest);
+		Optional<Teacher> teacher = teacherService.findTeacherById(teacherId);
+		Optional<Question> question = questionService.findQuestionById(questionId);
+	
+		TeacherAnswerRequest request = new TeacherAnswerRequest(questionService, teacherService, teacher, question, fileStorageService);
+		request.setImageFile(answerImage);
 		
 		teacherExists.setNextHandler(questionExists);
 		questionExists.setNextHandler(answerQuestion);
@@ -139,19 +175,6 @@ public class TeacherController {
 		oldAnswerAudioHandler.setNextHandler(updateAnswerHandler);
 		
 		return teacherExists_updateHandler.handle(request);
-		
-	/*	Teacher teacher = teacherService.findTeacherById(answerQuestionRequest.getTeacherId());
-		AnswerImage oldAnswerImage = teacherService.findAnswerImageFromTeacher(answerQuestionRequest.getTeacherId(), answerQuestionRequest.getQuestionId());
-		if (oldAnswerImage.getId() == 0)
-			return new ResponseEntity<>("Error happened", HttpStatus.INTERNAL_SERVER_ERROR);
-		
-		AnswerImage newAnswerImage = new AnswerImage();
-		newAnswerImage.setAssociatedQuestionId(answerQuestionRequest.getQuestionId());
-		newAnswerImage.setImage(answerQuestionRequest.getImageByte());
-		
-		teacherService.updateTeacherAnswerImage(teacher, oldAnswerImage, newAnswerImage);
-		
-		return new ResponseEntity<>("You changed your answer", HttpStatus.OK);*/
 	}
 	
 	

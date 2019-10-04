@@ -7,6 +7,7 @@ import com.myProjects.soru_cozum.model.Publisher;
 public interface PublisherDAO {
 	
 	Optional<Publisher> findById(Long publisherId);
+	
+	Optional<Long> registerNewPublisher(Publisher newPublisher);
 
-	Publisher createNewPublisher(Publisher publisher);
 }

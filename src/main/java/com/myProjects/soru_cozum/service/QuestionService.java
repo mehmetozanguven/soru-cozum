@@ -1,6 +1,7 @@
 package com.myProjects.soru_cozum.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.myProjects.soru_cozum.enums.QuestionCategory;
 import com.myProjects.soru_cozum.model.Publisher;
@@ -10,9 +11,9 @@ import com.myProjects.soru_cozum.model.Teacher;
 
 public interface QuestionService {
 	
-	Question findQuestionById(long questionId);
+	Optional<Question> findQuestionById(long questionId);
 
-	Question findQuestionByPageNumberQuestionNumberPublisher(int pageNumber, int questionNumber, Publisher publisher);
+	Optional<Question> findQuestionByPageNumber_QuestionNumber_Publisher(int pageNumber, int questionNumber, Publisher publisher, String questionCategory, String questionSubCategory);
 
 	QuestionImage createNewQuestionImage(byte[] imageByte);
 	
@@ -23,10 +24,10 @@ public interface QuestionService {
 	void updateQuestion(Question question);
 
 	Question createNewQuestionWithCommonProperties(int pageNumber, int questionNumber,
-			QuestionCategory questionCategory, String questionSubCategory, byte[] questionImageByte);
+			String questionCategory, String questionSubCategory, byte[] questionImageByte);
 	
 	Question createNewQuestionWithCommonProperties_multipart(int pageNumber, int questionNumber,
-			QuestionCategory questionCategory, String questionSubCategory, String downloadUrl);
+			String questionCategory, String questionSubCategory);
 	
 	void addPublisherToQuestionn(Question question, Publisher publisher);
 
