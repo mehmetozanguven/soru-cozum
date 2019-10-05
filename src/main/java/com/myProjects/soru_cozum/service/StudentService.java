@@ -14,8 +14,6 @@ public interface StudentService {
 
 	Optional<Student> findStudentById(Long studentId);
 
-	Student findByUsernameAndPassword(String username, String password);
-
 	Optional<Student> findByUsername(String username);
 
 	void addQuestionToStudent(Student student, Question question);

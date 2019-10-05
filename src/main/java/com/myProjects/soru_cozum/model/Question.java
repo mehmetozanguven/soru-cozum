@@ -99,10 +99,6 @@ public class Question implements Comparable<Question>{
 			return 0;
 	}
 
-	public Question(long id) {
-		this.id = id;
-	}
-
 	public void addTeacherToQuestion(Teacher teacher) {
 		if (teacherSet== null)
 			teacherSet = new TreeSet<>();

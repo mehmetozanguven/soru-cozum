@@ -124,12 +124,6 @@ public class StudentServiceImpl implements StudentService {
 	}
 
 	@Override
-	public Student findByUsernameAndPassword(String username, String password) {
-		Optional<Student> student = studentDAO.findByUsernameAndPassword(username, password);
-		return student.orElse(new Student("nonce"));
-	}
-
-	@Override
 	public Optional<Student> findByUsername(String username) {
 		Optional<Student> student = studentDAO.findByUsername(username);
 		return student;

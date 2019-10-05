@@ -54,10 +54,6 @@ public class Student {
 		studentQuestions =  new TreeSet<Question>();
 	}
 
-	public Student(String nonce) {
-		this.name = nonce;
-	}
-
 	public void addQuestionToStudent(Question question) {
 		if (studentQuestions == null)
 			studentQuestions = new TreeSet<Question>();
