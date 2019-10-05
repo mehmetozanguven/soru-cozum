@@ -98,7 +98,7 @@ public class QuestionDAOImpl implements QuestionDAO {
 	public List<Question> getAllNonAnsweredQuestionsBySpecificType(String questionType) {
 		Session currentSess = entityManager.unwrap(Session.class);
 
-		String hibernateQuery = "from Question q where q.questionCategory = :value and q.isAnswered = false";
+		String hibernateQuery = "from Question q where q.questionCategory = :value and (q.isImageAnswered = false and q.isAudioAnswered = false)" ;
 		TypedQuery<Question> query = currentSess.createQuery(hibernateQuery, Question.class);
 		query.setParameter("value", questionType);
 		List<Question> resultList = query.getResultList();

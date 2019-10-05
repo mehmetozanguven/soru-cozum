@@ -1,15 +1,20 @@
 package com.myProjects.soru_cozum.response;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.myProjects.soru_cozum.response.service.TeacherAnswerAudioServiceResponse;
 import com.myProjects.soru_cozum.response.service.TeacherAnswerImageServiceResponse;
 
 public class TeacherResponse {
 	@JsonAlias("response")
 	private String response;
-	@JsonAlias("imageDownloadJson")
+	
+	@JsonAlias("answerImageDownloadJson")
+	@JsonProperty("answerImageDownloadJson")
 	private TeacherAnswerImageServiceResponse imageJson;
-	@JsonAlias("audioDownloadJson")
+	
+	@JsonAlias("answerAudioDownloadJson")
+	@JsonProperty("answerAudioDownloadJson")
 	private TeacherAnswerAudioServiceResponse audioJson;
 
 	public TeacherResponse(String response) {
