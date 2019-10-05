@@ -10,10 +10,10 @@ import com.myProjects.soru_cozum.model.json.teacher.TeacherAnswerImageJSON;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AnsweredQuestionJSON {
 	
-	@JsonAlias("imageDownloadJSON")
+	@JsonAlias("answerImageDownloadJSON")
 	private TeacherAnswerImageJSON imageJSON;
 	
-	@JsonAlias("audioDownloadJSON")
+	@JsonAlias("answerAudioDownloadJSON")
 	private TeacherAnswerAudioJSON audioJSON;
 	
 	@JsonAlias("studentList")

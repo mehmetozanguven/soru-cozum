@@ -78,11 +78,19 @@ public class TeacherController {
 	 * @param questionCategory
 	 * @return
 	 */
-	@GetMapping("/allQuestion/{categoryName}")
-	public ResponseEntity<?> getAllNonAnsweredQuestionBySpecificType(@PathVariable("categoryName") QuestionCategory questionCategory){
-		// TODO Check this is working correctly
-		List<Question> allSpecificQuestions = questionService.getAllNonAnsweredQuestionsBySpecificType(questionCategory);
-		return ResponseEntity.ok(allSpecificQuestions);
+	@GetMapping("/getMyNonAnsweredQuestion/{categoryName}")
+	public ResponseEntity<?> getAllNonAnsweredQuestionBySpecificType(@PathVariable("categoryName") String questionCategory){
+		QuestionCategory foundQuestionCategory = QuestionCategory.questionCategoryFromValue(questionCategory);
+		if (foundQuestionCategory != null) {
+			List<Question> allSpecificQuestions = questionService.getAllNonAnsweredQuestionsBySpecificType(foundQuestionCategory);
+			return ResponseEntity.ok(allSpecificQuestions);
+		}else {
+			GenericResponse<TeacherResponse> response = new GenericResponse<TeacherResponse>();
+			response.setStatu("Error");
+			response.setInformation(new TeacherResponse("Invalid question category"));
+			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+		}
+			
 	}
 	
 	@GetMapping("/getMyAnsweredQuestion/{teacherId}")
@@ -115,7 +123,10 @@ public class TeacherController {
 			teacherId = Long.parseLong(teacherId_str);
 			questionId = Long.parseLong(questionId_str);
 		}catch (NumberFormatException e) {
-			return new ResponseEntity<>("Invalid request parameters", HttpStatus.BAD_REQUEST);
+			GenericResponse<TeacherResponse> response = new GenericResponse<TeacherResponse>();
+			response.setStatu("Error");
+			response.setInformation(new TeacherResponse("Invalid Request parameters"));
+			return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 		}
 		
 		Optional<Teacher> teacher = teacherService.findTeacherById(teacherId);
@@ -152,7 +163,10 @@ public class TeacherController {
 			teacherId = Long.parseLong(teacherId_str);
 			questionId = Long.parseLong(questionId_str);
 		}catch (NumberFormatException e) {
-			return new ResponseEntity<>("Invalid request parameters", HttpStatus.BAD_REQUEST);
+			GenericResponse<TeacherResponse> response = new GenericResponse<TeacherResponse>();
+			response.setStatu("Error");
+			response.setInformation(new TeacherResponse("Invalid Request parameters"));
+			return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 		}
 		
 		Optional<Teacher> teacher = teacherService.findTeacherById(teacherId);

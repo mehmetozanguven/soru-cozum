@@ -81,4 +81,14 @@ public class TeacherAnswerAudioUploadServiceRequest {
 		this.questionId = questionId;
 	}
 
+	@Override
+	public String toString() {
+		return "TeacherAnswerAudioUploadServiceRequest [answerAudioFile=" + answerAudioFile + ", publisherId="
+				+ publisherId + ", questionCategory=" + questionCategory + ", questionSubCategory="
+				+ questionSubCategory + ", pageNumber=" + pageNumber + ", questionNumber=" + questionNumber
+				+ ", teacherId=" + teacherId + ", questionId=" + questionId + "]";
+	}
+	
+	
+
 }

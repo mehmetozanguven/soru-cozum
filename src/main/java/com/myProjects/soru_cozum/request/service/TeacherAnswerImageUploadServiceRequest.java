@@ -80,4 +80,14 @@ public class TeacherAnswerImageUploadServiceRequest {
 		this.questionId = questionId;
 	}
 
+	@Override
+	public String toString() {
+		return "TeacherAnswerImageUploadServiceRequest [answerImageFile=" + answerImageFile + ", publisherId="
+				+ publisherId + ", questionCategory=" + questionCategory + ", questionSubCategory="
+				+ questionSubCategory + ", pageNumber=" + pageNumber + ", questionNumber=" + questionNumber
+				+ ", teacherId=" + teacherId + ", questionId=" + questionId + "]";
+	}
+	
+	
+
 }

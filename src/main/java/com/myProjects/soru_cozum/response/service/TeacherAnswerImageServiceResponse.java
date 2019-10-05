@@ -69,4 +69,14 @@ public class TeacherAnswerImageServiceResponse {
 		this.questionId = questionId;
 	}
 
+	@Override
+	public String toString() {
+		return "TeacherAnswerImageServiceResponse [publisherId=" + publisherId + ", questionCategory="
+				+ questionCategory + ", questionSubCategory=" + questionSubCategory + ", pageNumber=" + pageNumber
+				+ ", questionNumber=" + questionNumber + ", teacherId=" + teacherId + ", questionId=" + questionId
+				+ "]";
+	}
+	
+	
+
 }

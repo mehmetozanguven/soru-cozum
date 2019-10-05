@@ -43,7 +43,7 @@ public class FileController {
 	@Autowired
 	private Environment environment;
 	
-	@PostMapping("/downloadFile/Audio")
+	@PostMapping("/downloadFile/AnswerAudio")
 	public ResponseEntity<?> downloadTeacherAudioFile(@RequestBody TeacherAnswerAudioServiceResponse userRequest){
 		String filePath = fileStorageService.createAnswerAudioFilePath(userRequest);
 		Optional<Resource> resource = fileStorageService.loadFileAsResource_opt(filePath);
@@ -60,8 +60,8 @@ public class FileController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.get().getFilename() + "\"")
                 .body(resource.get());
 	}
-	
-	@PostMapping("/downloadFile/Image")
+
+	@PostMapping("/downloadFile/AnswerImage")
 	public ResponseEntity<?> downloadTeacherAnswerImage(@RequestBody TeacherAnswerImageServiceResponse userRequest){
 		String filePath = fileStorageService.createAnswerImageFilePath(userRequest);
 		Optional<Resource> resource = fileStorageService.loadFileAsResource_opt(filePath);

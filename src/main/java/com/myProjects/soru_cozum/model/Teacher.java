@@ -146,19 +146,38 @@ public class Teacher implements Comparable<Teacher> {
 	public void setTeacherDetails(TeacherDetails teacherDetails) {
 		this.teacherDetails = teacherDetails;
 	}
-
+	
+	/**
+	 * Add answer image to the teacher,
+	 * if answer image set already contains that image, then do nothing,
+	 * otherwise add image to the teacher
+	 * @param answerImage
+	 */
 	public void addImageToTeacher(AnswerImage answerImage) {
 		if (answerImageSet == null)
 			answerImageSet = new TreeSet<AnswerImage>();
-		answerImageSet.add(answerImage);
-		answerImage.setTeacher(this);
+		if (!answerImageSet.contains(answerImage)) {
+			answerImageSet.add(answerImage);
+			answerImage.setTeacher(this);
+		}
+		
 	}
-
+	
+	/**
+	 * Add answe audio to the teacher,
+	 * if answer audioSet already contains that audio, then do nothing,
+	 * otherwise add audio to the teacher
+	 * @param answerAudio
+	 */
 	public void addAudioToTeacher(AnswerAudio answerAudio) {
 		if (answerAudioSet == null)
 			answerAudioSet = new TreeSet<AnswerAudio>();
-		answerAudioSet.add(answerAudio);
-		answerAudio.setTeacher(this);
+		
+		if (!answerAudioSet.contains(answerAudio)) {
+			answerAudioSet.add(answerAudio);
+			answerAudio.setTeacher(this);
+		}
+		
 	}
 
 	public void addQuestionToTeacher(Question question) {
@@ -193,6 +212,10 @@ public class Teacher implements Comparable<Teacher> {
 
 	@Override
 	public String toString() {
-		return "Id: " + id + " username: " + username + " name: " + name;
+		return "Teacher [id=" + id + ", name=" + name + ", surname=" + surname + ", username=" + username
+				+ ", teacherDetails=" + teacherDetails + "]";
 	}
+	
+	
+	
 }
