@@ -1,5 +1,6 @@
 package com.myProjects.soru_cozum.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -84,7 +85,8 @@ public class Question implements Comparable<Question>{
 	private Publisher publisher;
 
 	public Question() {
-		
+		teacherSet = new TreeSet<Teacher>();
+		studentList = new ArrayList<Student>();
 	}
 	
 	@Override
