@@ -1,6 +1,8 @@
 package com.myProjects.soru_cozum.services;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +23,11 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.myProjects.soru_cozum.enums.Department;
+import com.myProjects.soru_cozum.model.Publisher;
 import com.myProjects.soru_cozum.model.Question;
 import com.myProjects.soru_cozum.model.Student;
+import com.myProjects.soru_cozum.model.StudentDetails;
 import com.myProjects.soru_cozum.repository.StudentDAO;
 import com.myProjects.soru_cozum.repository.StudentDAOImpl;
 import com.myProjects.soru_cozum.service.StudentService;
@@ -86,4 +91,66 @@ public class StudentServiceTests {
 		assertEquals((int)1, student.getStudentQuestions().size());
 	}
 	
+	@Test
+	public void createNewStudentDetails_test() {
+		String schoolName = "IYTE";
+		String classNumber = "5";
+		Department department = Department.DIL;
+		StudentDetails newStudentDetails = studentService.createStudentDetails(schoolName, classNumber, department);
+		
+		Object[] expecteds = {schoolName, classNumber, department.getValue()};
+		Object[] actuals = {newStudentDetails.getSchoolName(), newStudentDetails.getClassNum(), newStudentDetails.getDepartment()};
+		assertArrayEquals(expecteds, actuals);
+	}
+	
+	@Test
+	public void isStudentAskedThatQuestionBefore_succcessTest() {
+		int pageNumber = 5;
+		int questionNumber = 10;
+		String questionCategory = "Matematik";
+		String questionSubCategory = "Türev";
+		Publisher tempPublisher = new Publisher();
+		tempPublisher.setId((long)1);
+		Question tempQuestion = createTempQuestion(pageNumber, questionNumber, questionCategory, questionSubCategory,
+				tempPublisher);
+		
+		Student student = new Student();
+		student.setId((long) 1);
+		student.addQuestionToStudent(tempQuestion);
+		
+		Optional<Question> found = studentService.isStudentAskedThatQuestionBefore(student, tempPublisher, pageNumber, questionNumber, questionCategory, questionSubCategory);
+		
+		assertEquals(student.getId(), found.get().getId());
+	}
+	
+	@Test
+	public void isStudentAskedThatQuestionBefore_unsucccessTest() {
+		int pageNumber = 5;
+		int questionNumber = 10;
+		String questionCategory = "Matematik";
+		String questionSubCategory = "Türev";
+		Publisher tempPublisher = new Publisher();
+		tempPublisher.setId((long)1);
+		Question tempQuestion = createTempQuestion(pageNumber, questionNumber, questionCategory, questionSubCategory,
+				tempPublisher);
+		
+		Student student = new Student();
+		student.setId((long) 1);
+		
+		Optional<Question> found = studentService.isStudentAskedThatQuestionBefore(student, tempPublisher, pageNumber, questionNumber, questionCategory, questionSubCategory);
+		
+		assertNotEquals(student.getId(), found.get().getId());
+	}
+
+	private Question createTempQuestion(int pageNumber, int questionNumber, String questionCategory,
+			String questionSubCategory, Publisher tempPublisher) {
+		Question tempQuestion = new Question();
+		tempQuestion.setId((long)1);
+		tempQuestion.addPublisherToQuestion(tempPublisher);
+		tempQuestion.setPageNumber(pageNumber);
+		tempQuestion.setQuestionNumber(questionNumber);
+		tempQuestion.setQuestionCategory(questionCategory);
+		tempQuestion.setQuestionSubCategory(questionSubCategory);
+		return tempQuestion;
+	}
 }

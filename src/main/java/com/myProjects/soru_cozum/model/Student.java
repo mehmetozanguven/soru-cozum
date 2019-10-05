@@ -51,7 +51,7 @@ public class Student {
 	private Set<Question> studentQuestions;
 
 	public Student() {
-
+		studentQuestions =  new TreeSet<Question>();
 	}
 
 	public Student(String nonce) {
