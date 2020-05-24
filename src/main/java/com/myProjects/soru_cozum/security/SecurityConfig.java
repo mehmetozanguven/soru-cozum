@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.BeanIds;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -35,7 +36,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	public JwtAuthenticationFilter jwtPerRequestAuthenticationFilter() {
 		return new JwtAuthenticationFilter();
 	}
-	
+
+	@Bean
+	public MyCorsFilter corsFilter(){
+		return new MyCorsFilter();
+	}
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -89,6 +94,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 					.authenticated();
 		
 		// add custom JWT security filter
-		http.addFilterBefore(jwtPerRequestAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);				
+		http.addFilterBefore(jwtPerRequestAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore(corsFilter(), CorsFilter.class);
 	}	
 }
