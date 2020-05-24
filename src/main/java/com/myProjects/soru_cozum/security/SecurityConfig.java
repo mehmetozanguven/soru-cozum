@@ -95,6 +95,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		
 		// add custom JWT security filter
 		http.addFilterBefore(jwtPerRequestAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-		http.addFilterBefore(corsFilter(), CorsFilter.class);
-	}	
+	}
 }
